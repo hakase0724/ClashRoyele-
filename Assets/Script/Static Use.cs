@@ -1,7 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UniRx;
+using UniRx.Triggers;
+
 
 /// <summary>
 /// 自分がいろいろな所で使うメソッドをまとめる
@@ -16,6 +21,6 @@ public static class StaticUse
     {
         var master = SceneManager.GetSceneByName(sceneName);
         if (master.isLoaded) return;
-        else if (!master.isLoaded) SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
+        else if (!master.isLoaded) SceneManager.LoadScene(sceneName);
     }
 }

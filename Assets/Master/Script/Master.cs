@@ -2,13 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UniRx;
+using UniRx.Triggers;
 using static StaticUse;
 
 public class Master : Photon.PunBehaviour
 {
-    private void Awake()
+    private PlayerData playerData = new PlayerData();
+
+    public void ConnectNetWork(PlayerData data)
     {
+        playerData = data;
+        PhotonNetwork.playerName = data.playerName;
         PhotonNetwork.ConnectUsingSettings("0.1");
     }
 

@@ -1,19 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static StaticUse;
+using UniRx;
+using UniRx.Triggers;
 
-/// <summary>
-/// メインシーンが行う処理
-/// </summary>
-public class Main : MonoBehaviour
+public class Main : Photon.MonoBehaviour
 {
+    private PlayerData playerData = new PlayerData();
 
-	private void Start ()
+    private void Start()
     {
-        const string masterName = "Master";
-        SceneLoad(masterName);
-	}
-	
-	
+        Debug.Log("ルームに入った");
+        Debug.Log(PhotonNetwork.playerName);
+        playerData.playerName = PhotonNetwork.playerName;
+        playerData.playerId = PhotonNetwork.player.ID;
+        Debug.Log(playerData.playerName + "," + playerData.playerId);
+        Debug.Log("ルーム処理が終わった");
+    }
 }
