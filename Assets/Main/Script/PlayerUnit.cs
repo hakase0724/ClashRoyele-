@@ -15,11 +15,12 @@ public class PlayerUnit : Photon.MonoBehaviour
         if (photonView.isMine)
         {
             main = GameObject.FindGameObjectWithTag("Main").GetComponent<Main>();
-            if (main.playerData.playerId <= playerColor.Length) GetComponent<Renderer>().material = playerColor[main.playerData.playerId - 1];
-            this.OnMouseDownAsObservable()
-                .Where(_ => photonView.isMine)
-                .Subscribe(_ => Destroy(gameObject));
+            GetComponent<Renderer>().material = playerColor[0];          
         }
-        
+        else if(!photonView.isMine) GetComponent<Renderer>().material = playerColor[1];
+        this.OnMouseDownAsObservable()
+               .Where(_ => photonView.isMine)
+               .Subscribe(_ => Destroy(gameObject));
+
     }
 }
