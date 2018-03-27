@@ -26,6 +26,8 @@ GameObject:
   - component: {fileID: 114783569812018398}
   - component: {fileID: 114032022565433340}
   - component: {fileID: 114797673039614948}
+  - component: {fileID: 114440463000198304}
+  - component: {fileID: 114544552855009594}
   m_Layer: 0
   m_Name: Unit
   m_TagString: Untagged
@@ -129,7 +131,7 @@ MonoBehaviour:
     SynchronizeEnabled: 1
     TeleportEnabled: 1
     TeleportIfDistanceGreaterThan: 3
-    InterpolateOption: 2
+    InterpolateOption: 3
     InterpolateMoveTowardsSpeed: 1
     InterpolateLerpSpeed: 1
     InterpolateMoveTowardsAcceleration: 2
@@ -179,6 +181,30 @@ MonoBehaviour:
     InterpolateOption: 0
     InterpolateMoveTowardsSpeed: 1
     InterpolateLerpSpeed: 0
+--- !u!114 &114440463000198304
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1951150232751002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64179f3720bbfe947b7724caa67b7c1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizeVelocity: 1
+  m_SynchronizeAngularVelocity: 1
+--- !u!114 &114544552855009594
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1951150232751002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56c1a5cf8b08d25478d48d50c56b0061, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114783569812018398
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -200,6 +226,7 @@ MonoBehaviour:
   ownershipTransfer: 0
   ObservedComponents:
   - {fileID: 114032022565433340}
+  - {fileID: 114440463000198304}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 0
   instantiationId: -1
