@@ -17,6 +17,8 @@ public class Master : Photon.PunBehaviour
         playerData = data;
         PhotonNetwork.playerName = data.playerName;
         PhotonNetwork.ConnectUsingSettings("0.1");
+        PhotonNetwork.sendRate = 60;
+        PhotonNetwork.sendRateOnSerialize = 60;
     }
 
     //ロビーに入った時、Roomを探して入る
