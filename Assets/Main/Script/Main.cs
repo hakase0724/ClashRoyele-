@@ -6,7 +6,9 @@ using UniRx.Triggers;
 
 public class Main : Photon.MonoBehaviour
 {
-    private PlayerData playerData = new PlayerData();
+    public PlayerData playerData { get; private set; }
+
+    private void Awake() => playerData = new PlayerData();
 
     private void Start()
     {
