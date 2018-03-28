@@ -17,7 +17,7 @@ public class InstantiateFiled : Photon.PunBehaviour
     private void OnClick()
     {
         if (!PhotonNetwork.inRoom) return;       
-        photonView.RPC("RPCTest", PhotonTargets.All, InputToEvent.inputHitPos, PhotonNetwork.player.ID);
+        photonView.RPC("RPCTest", PhotonTargets.All, InputToEvent.inputHitPos, PhotonNetwork.player.ID,main.energy.Value);
     }
 
     /// <summary>
@@ -27,7 +27,7 @@ public class InstantiateFiled : Photon.PunBehaviour
     /// <param name="id">生成者ID</param>
     /// <returns></returns>
     [PunRPC]
-    private IEnumerator RPCTest(Vector3 pos,int id)
+    private IEnumerator RPCTest(Vector3 pos,int id,float energy)
     {
         //生成待機時間
         const int waitFrame = 10;
@@ -36,9 +36,9 @@ public class InstantiateFiled : Photon.PunBehaviour
         if (IsSameId(id,PhotonNetwork.player.ID))
         {
             Observable.TimerFrame(waitFrame)
-                .Subscribe(_=> MyInstantiate(prefab, pos + new Vector3(0, 1, 0),id));
+                .Subscribe(_=> MyInstantiate(prefab, pos + new Vector3(0, 1, 0),id, energy));
         }
-        else MyInstantiate(prefab, pos + new Vector3(0, 1, 0), id);
+        else MyInstantiate(prefab, pos + new Vector3(0, 1, 0), id,energy);
         yield return null;
     }
 
@@ -48,12 +48,12 @@ public class InstantiateFiled : Photon.PunBehaviour
     /// <param name="game">生成するオブジェクト</param>
     /// <param name="pos">生成場所</param>
     /// <param name="id">生成者ID</param>
-    private void MyInstantiate(GameObject game,Vector3 pos,int id)
+    private void MyInstantiate(GameObject game,Vector3 pos,int id,float energy)
     {
-        var energy = game.GetComponent(typeof(IUnit)) as IUnit;
+        var useEnergy = game.GetComponent(typeof(IUnit)) as IUnit;
         Debug.Log(main);
-        Debug.Log(energy.UnitEnergy);
-        if (!main.IsUseEnergy(energy.UnitEnergy,id)) return;
+        Debug.Log(useEnergy.UnitEnergy);
+        if (!main.IsUseEnergy(useEnergy.UnitEnergy,id,energy)) return;
         var gameObject = Instantiate(game, pos, Quaternion.identity);
         var unit = gameObject.GetComponent(typeof(IUnit)) as IUnit;
         unit.MyColor(id);
