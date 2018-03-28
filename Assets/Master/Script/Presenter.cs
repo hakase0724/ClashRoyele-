@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
-
+/// <summary>
+/// MV(R)PのPresenter名前入力を受けて接続命令を走らせる
+/// </summary>
 public class Presenter : MonoBehaviour
 {
     [SerializeField]

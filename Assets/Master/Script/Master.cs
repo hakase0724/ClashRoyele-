@@ -8,18 +8,24 @@ using UniRx;
 using UniRx.Triggers;
 using static StaticUse;
 
+/// <summary>
+/// マスターシーンの処理
+/// </summary>
 public class Master : Photon.PunBehaviour
 {
     private PlayerData playerData = new PlayerData();
     
-
+    /// <summary>
+    /// プレイヤーデータを受け取りネットワーク接続を開始する
+    /// </summary>
+    /// <param name="data"></param>
     public void ConnectNetWork(PlayerData data)
     {
         playerData = data;
         PhotonNetwork.playerName = data.playerName;
-        PhotonNetwork.ConnectUsingSettings("0.1");
-        const int sendRateValue = 30;
-        const int sendRateOnSerializeValue = 30;
+        PhotonNetwork.ConnectUsingSettings("0." + SceneManagerHelper.ActiveSceneBuildIndex);
+        const int sendRateValue = 60;
+        const int sendRateOnSerializeValue = 60;
         PhotonNetwork.sendRate = sendRateValue;
         PhotonNetwork.sendRateOnSerialize = sendRateOnSerializeValue;
     }
