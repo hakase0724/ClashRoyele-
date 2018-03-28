@@ -24,8 +24,8 @@ public class Master : Photon.PunBehaviour
         playerData = data;
         PhotonNetwork.playerName = data.playerName;
         PhotonNetwork.ConnectUsingSettings("0." + SceneManagerHelper.ActiveSceneBuildIndex);
-        const int sendRateValue = 60;
-        const int sendRateOnSerializeValue = 60;
+        const int sendRateValue = 30;
+        const int sendRateOnSerializeValue = 30;
         PhotonNetwork.sendRate = sendRateValue;
         PhotonNetwork.sendRateOnSerialize = sendRateOnSerializeValue;
     }
