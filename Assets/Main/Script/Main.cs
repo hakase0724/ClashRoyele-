@@ -33,12 +33,12 @@ public class Main : Photon.MonoBehaviour
 
     public bool IsUseEnergy(float useEnergy,int id)
     {
-        if (!IsSameId(id, PhotonNetwork.player.ID)) return false;
         if (energy.Value < useEnergy) return false;
-        else
+        else if (IsSameId(id, PhotonNetwork.player.ID))
         {
             energy.Value -= useEnergy;
             return true;
         }
+        else return false;
     }
 }
