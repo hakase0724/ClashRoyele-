@@ -10,6 +10,7 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
 {
     public float UnitHp { get; set; } = 10;
     public float UnitEnergy { get; set; } = 1;
+    private int identificationNumber;
     private Rigidbody rb => GetComponent<Rigidbody>();
     private Animator anim => GetComponent<Animator>();
     [SerializeField]
@@ -21,7 +22,7 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
         this.UpdateAsObservable()
             .Subscribe(_ => 
             {
-                if (Camera.main.transform.rotation.z >= 180) rb.velocity = -Vector3.forward;
+                if (identificationNumber == 0) rb.velocity = -Vector3.forward;
                 else rb.velocity = Vector3.forward;
             });
     }
@@ -32,6 +33,7 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
         int colorNumber;
         if (IsSameId(id,PhotonNetwork.player.ID)) colorNumber = 0;
         else colorNumber = 1;
+        identificationNumber = colorNumber;
         foreach (Renderer renderer in renderers)
         {
             //プレイヤーIDを配列インデックスに合わせて色を変える
