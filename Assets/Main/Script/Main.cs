@@ -33,6 +33,7 @@ public class Main : Photon.MonoBehaviour
 
     public bool UseEnergy(float useEnergy)
     {
+        if (!photonView.isMine) return false;
         if (energy.Value < useEnergy) return false;
         else
         {
