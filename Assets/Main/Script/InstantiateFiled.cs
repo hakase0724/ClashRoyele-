@@ -13,7 +13,8 @@ public class InstantiateFiled : Photon.PunBehaviour
     private void OnClick()
     {
         if (!PhotonNetwork.inRoom) return;       
-        photonView.RPC("RPCTest", PhotonTargets.All, InputToEvent.inputHitPos);
+        photonView.RPC("RPCTest", PhotonTargets.Others, InputToEvent.inputHitPos);
+        PhotonNetwork.Instantiate(prefab.name, InputToEvent.inputHitPos, Quaternion.identity, 0);
     }
 
     [PunRPC]
