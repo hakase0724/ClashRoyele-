@@ -20,29 +20,28 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
     {
         anim.enabled = true;
         Vector3 vector = new Vector3(0, 0, 1);
-        Debug.Log(Camera.main.transform.localEulerAngles.z);
         if (identificationNumber == 0)
         {
-            if (Camera.main.GetComponent<CameraRotation>().IsRotated)
-            {
-                Debug.Log("回転");
-                transform.Rotate(new Vector3(0, 180, 0));
-                vector *= -1;
-            }
-            
+            if (Camera.main.GetComponent<CameraRotation>().IsRotated) vector = VectolChange(vector);
         }
         else
         {
-            if (!Camera.main.GetComponent<CameraRotation>().IsRotated)
-            {
-                Debug.Log("回転");
-                transform.Rotate(new Vector3(0, 180, 0));
-                vector *= -1;
-            }
-            
+            if (!Camera.main.GetComponent<CameraRotation>().IsRotated) vector = VectolChange(vector); 
         }
         this.UpdateAsObservable()
             .Subscribe(_ => rb.velocity = vector);
+    }
+
+    /// <summary>
+    /// 向きと進行方向を切り替える
+    /// </summary>
+    /// <param name="vector">進行方向</param>
+    /// <returns></returns>
+    private Vector3 VectolChange(Vector3 vector)
+    {
+        transform.Rotate(new Vector3(0, 180, 0));
+        vector *= -1;
+        return vector;
     }
 
     public void MyColor(int id)
