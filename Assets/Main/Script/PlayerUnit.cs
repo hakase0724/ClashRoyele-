@@ -20,20 +20,20 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
     {
         anim.enabled = true;
         Vector3 vector;
+        Debug.Log(Camera.main.transform.localEulerAngles.z);
         if (identificationNumber == 0)
         {
-            transform.Rotate(new Vector3(0, 180, 0));
-            vector = new Vector3(0, 0, -1);
+            if (Camera.main.GetComponent<CameraRotation>().IsRotated)
+            {
+                Debug.Log("回転");
+                transform.Rotate(new Vector3(0, 180, 0));
+            }
+            vector = new Vector3(0, 0, 1);
         }
         else
         {
-            //transform.Rotate(new Vector3(0, 180, 0));
-            vector = new Vector3(0, 0, 1);
-        }
-        if (Camera.main.transform.rotation.z < 180)
-        {
-            transform.Rotate(new Vector3(0, 180, 0));
-            vector *= -1;
+            if (!Camera.main.GetComponent<CameraRotation>().IsRotated) transform.Rotate(new Vector3(0, 180, 0));
+            vector = new Vector3(0, 0, -1);
         }
         this.UpdateAsObservable()
             .Subscribe(_ => rb.velocity = vector);
