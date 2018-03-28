@@ -17,7 +17,6 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
         else if (!photonView.isMine)
         {
             GetComponent<Renderer>().material = playerColor[1];
-            rb.isKinematic = true;
         }
         Move();
     }

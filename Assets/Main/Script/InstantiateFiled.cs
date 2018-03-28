@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon;
+using UniRx;
 
 /// <summary>
 /// オブジェクトを生成する場所
@@ -20,7 +21,12 @@ public class InstantiateFiled : Photon.PunBehaviour
     private IEnumerator RPCTest(Vector3 pos)
     {
         Debug.Log("RPC" + PhotonNetwork.player.ID);
-        Instantiate(prefab, pos, Quaternion.identity);
+        if (photonView.isMine)
+        {
+            Observable.IntervalFrame(1)
+                .Subscribe(_=> Instantiate(prefab, pos + new Vector3(0, 1, 0), Quaternion.identity));
+        }
+        else if(!photonView.isMine) Instantiate(prefab, pos + new Vector3(0,1,0), Quaternion.identity);
         yield return null;
     }
 	
