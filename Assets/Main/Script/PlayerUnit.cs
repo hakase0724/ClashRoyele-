@@ -8,13 +8,16 @@ using static StaticUse;
 
 public class PlayerUnit : Photon.MonoBehaviour,IUnit
 {
-    public float UnitHp { get; set; }
+    public float UnitHp { get; set; } = 10;
+    public float UnitEnergy { get; set; } = 1;
     private Rigidbody rb => GetComponent<Rigidbody>();
+    private Animator anim => GetComponent<Animator>();
     [SerializeField]
     private Color[] color = new Color[0];
 
     public void Move()
     {
+        anim.enabled = true;
         this.UpdateAsObservable()
             .Subscribe(_ => rb.velocity = Vector3.forward);
     }
@@ -30,7 +33,9 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
             //プレイヤーIDを配列インデックスに合わせて色を変える
             renderer.material.color = color[colorNumber];
         }
-        Move();
+        const int waitTime = 1;
+        Observable.Timer(System.TimeSpan.FromSeconds(waitTime))
+            .Subscribe(_ => Move());
     }
 
     public void Attack(float attack)

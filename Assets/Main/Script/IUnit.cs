@@ -9,6 +9,8 @@ public interface IUnit
 {
     //ユニットの体力
     float UnitHp { get;set;}
+    //ユニット生成時のコスト
+    float UnitEnergy { get; set; }
     /// <summary>
     /// 自機の色を変える
     /// </summary>

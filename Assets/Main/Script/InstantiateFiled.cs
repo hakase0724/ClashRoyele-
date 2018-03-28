@@ -11,6 +11,8 @@ using static StaticUse;
 public class InstantiateFiled : Photon.PunBehaviour
 {
     [SerializeField]
+    private Main main;
+    [SerializeField]
     private GameObject prefab;
     private void OnClick()
     {
@@ -48,6 +50,10 @@ public class InstantiateFiled : Photon.PunBehaviour
     /// <param name="id">生成者ID</param>
     private void MyInstantiate(GameObject game,Vector3 pos,int id)
     {
+        var energy = game.GetComponent(typeof(IUnit)) as IUnit;
+        Debug.Log(main);
+        Debug.Log(energy.UnitEnergy);
+        if (!main.UseEnergy(energy.UnitEnergy)) return;
         var gameObject = Instantiate(game, pos, Quaternion.identity);
         var unit = gameObject.GetComponent(typeof(IUnit)) as IUnit;
         unit.MyColor(id);
