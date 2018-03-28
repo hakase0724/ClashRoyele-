@@ -16,10 +16,6 @@ public class InstantiateFiled : Photon.PunBehaviour
     private void OnClick()
     {
         if (!PhotonNetwork.inRoom) return;
-        Debug.Log("1" + InputToEvent.inputHitPos);
-        Debug.Log("2" + PhotonNetwork.player.ID);
-        Debug.Log("3" + main.energy.Value);
-        Debug.Log("4" + photonView.viewID);
         photonView.RPC("MyInstantiateRPC", PhotonTargets.All, InputToEvent.inputHitPos, PhotonNetwork.player.ID,main.energy.Value);
     }
 
@@ -30,7 +26,7 @@ public class InstantiateFiled : Photon.PunBehaviour
     /// <param name="id">生成者ID</param>
     /// <returns></returns>
     [PunRPC]
-    private IEnumerator MyInstantiateRPC(Vector3 pos,int id,float energy)
+    protected virtual IEnumerator MyInstantiateRPC(Vector3 pos,int id,float energy)
     {
         //生成待機時間
         const int waitFrame = 10;
