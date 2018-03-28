@@ -19,16 +19,19 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
     public void Move()
     {
         anim.enabled = true;
+        Vector3 vector;
+        if (identificationNumber == 0)
+        {
+            transform.Rotate(new Vector3(0, 180, 0));
+            vector = new Vector3(0, 0, -1);
+        }
+        else
+        {
+            //transform.Rotate(new Vector3(0, 180, 0));
+            vector = new Vector3(0, 0, 1);
+        }
         this.UpdateAsObservable()
-            .Subscribe(_ => 
-            {
-                if (identificationNumber == 0) rb.velocity = new Vector3(0, 0, 1);
-                else
-                {
-                    transform.Rotate(new Vector3(0, 0, 180));
-                    rb.velocity = new Vector3(0, 0, -1);
-                };
-            });
+            .Subscribe(_ => rb.velocity = vector);
     }
 
     public void MyColor(int id)
