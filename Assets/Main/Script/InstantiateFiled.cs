@@ -52,9 +52,9 @@ public class InstantiateFiled : Photon.PunBehaviour
     {
         var useEnergy = game.GetComponent(typeof(IUnit)) as IUnit;
         if (!main.IsUseEnergy(useEnergy.UnitEnergy,id,energy)) return;
-        GameObject gameObject;
-        if (IsSameId(id,PhotonNetwork.player.ID)) gameObject = Instantiate(game, pos, Quaternion.identity);
-        else gameObject = Instantiate(game, pos, Quaternion.Euler(0,180,0));
+        GameObject gameObject = Instantiate(game, pos, Quaternion.identity);
+        //if (IsSameId(id,PhotonNetwork.player.ID)) gameObject = Instantiate(game, pos, Quaternion.identity);
+        //else gameObject = Instantiate(game, pos, Quaternion.Euler(0,180,0));
         var unit = gameObject.GetComponent(typeof(IUnit)) as IUnit;
         unit.MyColor(id);
     }
