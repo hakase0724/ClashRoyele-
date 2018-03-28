@@ -39,6 +39,6 @@ public class Main : Photon.MonoBehaviour
             energy.Value -= useEnergy;
             return true;
         }
-        else return false;
+        else return true;
     }
 }
