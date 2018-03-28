@@ -23,17 +23,25 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
         Debug.Log(Camera.main.transform.localEulerAngles.z);
         if (identificationNumber == 0)
         {
+            vector = new Vector3(0, 0, 1);
             if (Camera.main.GetComponent<CameraRotation>().IsRotated)
             {
                 Debug.Log("回転");
                 transform.Rotate(new Vector3(0, 180, 0));
+                vector *= -1;
             }
-            vector = new Vector3(0, 0, 1);
+            
         }
         else
         {
-            if (!Camera.main.GetComponent<CameraRotation>().IsRotated) transform.Rotate(new Vector3(0, 180, 0));
             vector = new Vector3(0, 0, -1);
+            if (!Camera.main.GetComponent<CameraRotation>().IsRotated)
+            {
+                Debug.Log("回転");
+                transform.Rotate(new Vector3(0, 180, 0));
+                vector *= -1;
+            }
+            
         }
         this.UpdateAsObservable()
             .Subscribe(_ => rb.velocity = vector);
