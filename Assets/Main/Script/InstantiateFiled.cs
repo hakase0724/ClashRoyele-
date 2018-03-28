@@ -10,13 +10,16 @@ using static StaticUse;
 /// </summary>
 public class InstantiateFiled : Photon.PunBehaviour
 {
-    [SerializeField]
-    private Main main;
+    private Main main => GameObject.FindGameObjectWithTag("Main").GetComponent<Main>();
     [SerializeField]
     private GameObject prefab;
     private void OnClick()
     {
-        if (!PhotonNetwork.inRoom) return;       
+        if (!PhotonNetwork.inRoom) return;
+        Debug.Log("1" + InputToEvent.inputHitPos);
+        Debug.Log("2" + PhotonNetwork.player.ID);
+        Debug.Log("3" + main.energy.Value);
+        Debug.Log("4" + photonView.viewID);
         photonView.RPC("MyInstantiateRPC", PhotonTargets.All, InputToEvent.inputHitPos, PhotonNetwork.player.ID,main.energy.Value);
     }
 

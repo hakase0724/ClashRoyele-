@@ -7,7 +7,7 @@ using Photon;
 public class CameraRotation : Photon.MonoBehaviour
 {
     public bool IsRotated { get; private set; } = false;
-    private void Start()
+    private void Awake()
     {
         if (!PhotonNetwork.isMasterClient)
         {

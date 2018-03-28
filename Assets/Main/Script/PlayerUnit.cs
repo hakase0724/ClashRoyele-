@@ -53,7 +53,6 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
         identificationNumber = colorNumber;
         foreach (Renderer renderer in renderers)
         {
-            //プレイヤーIDを配列インデックスに合わせて色を変える
             renderer.material.color = color[colorNumber];
         }
         const int waitTime = 1;
