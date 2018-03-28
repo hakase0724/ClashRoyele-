@@ -24,10 +24,17 @@ public class InstantiateFiled : Photon.PunBehaviour
         if (id == PhotonNetwork.player.ID)
         {
             Observable.TimerFrame(10)
-                .Subscribe(_=> Instantiate(prefab, pos + new Vector3(0, 1, 0), Quaternion.identity));
+                .Subscribe(_=> MyInstantiate(prefab, pos + new Vector3(0, 1, 0),id));
         }
-        else if(id != PhotonNetwork.player.ID) Instantiate(prefab, pos + new Vector3(0,1,0), Quaternion.identity);
+        else if(id != PhotonNetwork.player.ID) MyInstantiate(prefab, pos + new Vector3(0, 1, 0), id);
         yield return null;
+    }
+
+    private void MyInstantiate(GameObject game,Vector3 pos,int id)
+    {
+        var gameObject = Instantiate(game, pos, Quaternion.identity);
+        var unit = gameObject.GetComponent(typeof(IUnit)) as IUnit;
+        unit.MyColor(id);
     }
 	
 }
