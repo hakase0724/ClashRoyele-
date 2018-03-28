@@ -22,8 +22,8 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
         this.UpdateAsObservable()
             .Subscribe(_ => 
             {
-                if (identificationNumber == 0) rb.velocity = -Vector3.forward;
-                else rb.velocity = Vector3.forward;
+                if (identificationNumber == 0) rb.velocity = Vector3.forward;
+                else rb.velocity = -Vector3.forward;
             });
     }
 
