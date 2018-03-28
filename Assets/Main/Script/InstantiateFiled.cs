@@ -53,7 +53,7 @@ public class InstantiateFiled : Photon.PunBehaviour
         var energy = game.GetComponent(typeof(IUnit)) as IUnit;
         Debug.Log(main);
         Debug.Log(energy.UnitEnergy);
-        if (!main.UseEnergy(energy.UnitEnergy)) return;
+        if (!main.IsUseEnergy(energy.UnitEnergy,id)) return;
         var gameObject = Instantiate(game, pos, Quaternion.identity);
         var unit = gameObject.GetComponent(typeof(IUnit)) as IUnit;
         unit.MyColor(id);

@@ -4,6 +4,7 @@ using UnityEngine;
 using UniRx;
 using UniRx.Triggers;
 using UnityEngine.UI;
+using static StaticUse;
 
 public class Main : Photon.MonoBehaviour
 {
@@ -30,10 +31,9 @@ public class Main : Photon.MonoBehaviour
             .Subscribe(x => slider.value = x / 10);
     }
 
-    public bool UseEnergy(float useEnergy)
+    public bool IsUseEnergy(float useEnergy,int id)
     {
-        Debug.Log(photonView.isMine);
-        if (!photonView.isMine) return false;
+        if (!IsSameId(id, PhotonNetwork.player.ID)) return false;
         if (energy.Value < useEnergy) return false;
         else
         {
