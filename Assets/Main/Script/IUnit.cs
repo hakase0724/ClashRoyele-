@@ -9,12 +9,23 @@ public interface IUnit
 {
     //ユニットの体力
     float UnitHp { get;set;}
-    //自分の色を変える
+    /// <summary>
+    /// 自機の色を変える
+    /// </summary>
+    /// <param name="id">識別用のID</param>
     void MyColor(int id);
-    //ユニットの動き
+    /// <summary>
+    /// 自機の移動
+    /// </summary>
     void Move();
-    //ユニットの攻撃
+    /// <summary>
+    /// 自機の攻撃
+    /// </summary>
+    /// <param name="attack">攻撃力</param>
     void Attack(float attack);
-    //ユニットがダメージを受ける
+    /// <summary>
+    /// ダメージを受ける
+    /// </summary>
+    /// <param name="damage">受けるダメージ</param>
     void Damage(float damage);
 }
