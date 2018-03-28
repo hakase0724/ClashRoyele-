@@ -17,7 +17,7 @@ public class InstantiateFiled : Photon.PunBehaviour
     private void OnClick()
     {
         if (!PhotonNetwork.inRoom) return;       
-        photonView.RPC("RPCTest", PhotonTargets.All, InputToEvent.inputHitPos, PhotonNetwork.player.ID,main.energy.Value);
+        photonView.RPC("MyInstantiateRPC", PhotonTargets.All, InputToEvent.inputHitPos, PhotonNetwork.player.ID,main.energy.Value);
     }
 
     /// <summary>
@@ -27,7 +27,7 @@ public class InstantiateFiled : Photon.PunBehaviour
     /// <param name="id">生成者ID</param>
     /// <returns></returns>
     [PunRPC]
-    private IEnumerator RPCTest(Vector3 pos,int id,float energy)
+    private IEnumerator MyInstantiateRPC(Vector3 pos,int id,float energy)
     {
         //生成待機時間
         const int waitFrame = 10;
@@ -51,8 +51,6 @@ public class InstantiateFiled : Photon.PunBehaviour
     private void MyInstantiate(GameObject game,Vector3 pos,int id,float energy)
     {
         var useEnergy = game.GetComponent(typeof(IUnit)) as IUnit;
-        Debug.Log(main);
-        Debug.Log(useEnergy.UnitEnergy);
         if (!main.IsUseEnergy(useEnergy.UnitEnergy,id,energy)) return;
         var gameObject = Instantiate(game, pos, Quaternion.identity);
         var unit = gameObject.GetComponent(typeof(IUnit)) as IUnit;

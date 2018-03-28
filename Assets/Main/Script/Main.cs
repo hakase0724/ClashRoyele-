@@ -8,8 +8,11 @@ using static StaticUse;
 
 public class Main : Photon.MonoBehaviour
 {
+    //ユニットを出すのに使用するエネルギー
     public FloatReactiveProperty energy { get; private set; } = new FloatReactiveProperty(3);
+    //プレイヤーデータをやり取りするための領域
     public PlayerData playerData { get; private set; }
+    //エネルギーを表示するバー
     [SerializeField]
     private Slider slider;
     private void Awake()
@@ -31,10 +34,19 @@ public class Main : Photon.MonoBehaviour
             .Subscribe(x => slider.value = x / 10);
     }
 
+    /// <summary>
+    /// エネルギーと操作者によってオブジェクトの生成可否を判定する
+    /// </summary>
+    /// <param name="useEnergy">生成に使用するエネルギー</param>
+    /// <param name="id">操作者識別ID</param>
+    /// <param name="enemyEnergy">通信相手のエネルギー</param>
+    /// <returns></returns>
     public bool IsUseEnergy(float useEnergy,int id,float enemyEnergy)
     {
+        //操作者が自分であれば
         if (IsSameId(id, PhotonNetwork.player.ID))
         {
+            //エネルギーが足りていれば
             if (energy.Value < useEnergy) return false;
             else
             {
@@ -42,6 +54,7 @@ public class Main : Photon.MonoBehaviour
                 return true;
             }
         }
+        //相手のエネルギーが足りていなければ
         else if (enemyEnergy < useEnergy) return false;
         else return true;
     }
