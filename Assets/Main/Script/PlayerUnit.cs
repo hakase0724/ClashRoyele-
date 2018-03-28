@@ -30,6 +30,11 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
             //transform.Rotate(new Vector3(0, 180, 0));
             vector = new Vector3(0, 0, 1);
         }
+        if (Camera.main.transform.rotation.z < 180)
+        {
+            transform.Rotate(new Vector3(0, 180, 0));
+            vector *= -1;
+        }
         this.UpdateAsObservable()
             .Subscribe(_ => rb.velocity = vector);
     }
