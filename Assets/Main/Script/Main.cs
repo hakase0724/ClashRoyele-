@@ -31,9 +31,9 @@ public class Main : Photon.MonoBehaviour
             .Subscribe(x => slider.value = x / 10);
     }
 
-    public bool IsUseEnergy(float useEnergy,int id)
+    public bool IsUseEnergy(float useEnergy,int id,float enemyEnergy)
     {
-        if(IsSameId(id, PhotonNetwork.player.ID))
+        if (IsSameId(id, PhotonNetwork.player.ID))
         {
             if (energy.Value < useEnergy) return false;
             else
@@ -41,7 +41,8 @@ public class Main : Photon.MonoBehaviour
                 energy.Value -= useEnergy;
                 return true;
             }
-        }       
+        }
+        else if (enemyEnergy < useEnergy) return false;
         else return true;
     }
 }
