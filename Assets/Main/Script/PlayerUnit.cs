@@ -10,7 +10,7 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
 {
     public float UnitHp { get; set; } = 10;
     public float UnitEnergy { get; set; } = 1;
-    private int identificationNumber;
+    private int identificationNumber = 0;
     private Rigidbody rb => GetComponent<Rigidbody>();
     private Animator anim => GetComponent<Animator>();
     [SerializeField]
