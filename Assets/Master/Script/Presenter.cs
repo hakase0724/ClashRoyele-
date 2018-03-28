@@ -17,19 +17,15 @@ public class Presenter : MonoBehaviour
 
     private void Start()
     {
-        PlayerData data = new PlayerData();
-        nameInput
-            .OnValueChangedAsObservable()
-            .Subscribe(x => model.name.Value = x);
+        nameInput.ActivateInputField();
+    }
 
-        model.name
-            .Where(x => !string.IsNullOrEmpty(x))
-            .Where(_ => Input.GetKeyDown(KeyCode.Space))
-            .Subscribe(x => 
-            {
-                data.playerName = x;
-                master.ConnectNetWork(data);
-            });
+    public void EndInput()
+    {
+        PlayerData data = new PlayerData();
+        string name = nameInput.text;
+        data.playerName = name;
+        master.ConnectNetWork(data);
     }
 	
 }
