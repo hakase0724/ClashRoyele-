@@ -4,6 +4,7 @@ using UnityEngine;
 using Photon;
 using UniRx;
 using UniRx.Triggers;
+using static StaticUse;
 
 public class PlayerUnit : Photon.MonoBehaviour,IUnit
 {
@@ -21,10 +22,13 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
     public void MyColor(int id)
     {
         Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
-
+        int colorNumber;
+        if (IsSameId(id,PhotonNetwork.player.ID)) colorNumber = 0;
+        else colorNumber = 1;
         foreach (Renderer renderer in renderers)
         {
-            renderer.material.color = color[id - 1];
+            //プレイヤーIDを配列インデックスに合わせて色を変える
+            renderer.material.color = color[colorNumber];
         }
         Move();
     }

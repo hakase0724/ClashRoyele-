@@ -23,4 +23,18 @@ public static class StaticUse
         if (master.isLoaded) return;
         else if (!master.isLoaded) SceneManager.LoadScene(sceneName);
     }
+
+    /// <summary>
+    /// 通信で受け取ったIDと自分のIDを比較し結果を返す
+    /// </summary>
+    /// <param name="receivedId">通信で受け取ったID</param>
+    /// <param name="myId">自分のID</param>
+    /// <returns></returns>
+    public static bool IsSameId(int receivedId,int myId)
+    {
+        bool result = false;
+        if (receivedId == myId) result = true;
+        else result = false;
+        return result;
+    }
 }

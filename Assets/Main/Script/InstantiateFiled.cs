@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon;
 using UniRx;
+using static StaticUse;
 
 /// <summary>
 /// オブジェクトを生成する場所
@@ -30,12 +31,12 @@ public class InstantiateFiled : Photon.PunBehaviour
         const int waitFrame = 10;
         //生成者が自分ならwaitFrame分待機
         //相手なら即時生成
-        if (id == PhotonNetwork.player.ID)
+        if (IsSameId(id,PhotonNetwork.player.ID))
         {
             Observable.TimerFrame(waitFrame)
                 .Subscribe(_=> MyInstantiate(prefab, pos + new Vector3(0, 1, 0),id));
         }
-        else if(id != PhotonNetwork.player.ID) MyInstantiate(prefab, pos + new Vector3(0, 1, 0), id);
+        else MyInstantiate(prefab, pos + new Vector3(0, 1, 0), id);
         yield return null;
     }
 
