@@ -11,14 +11,17 @@ using static StaticUse;
 public class Master : Photon.PunBehaviour
 {
     private PlayerData playerData = new PlayerData();
+    
 
     public void ConnectNetWork(PlayerData data)
     {
         playerData = data;
         PhotonNetwork.playerName = data.playerName;
         PhotonNetwork.ConnectUsingSettings("0.1");
-        PhotonNetwork.sendRate = 60;
-        PhotonNetwork.sendRateOnSerialize = 60;
+        const int sendRateValue = 30;
+        const int sendRateOnSerializeValue = 30;
+        PhotonNetwork.sendRate = sendRateValue;
+        PhotonNetwork.sendRateOnSerialize = sendRateOnSerializeValue;
     }
 
     //ロビーに入った時、Roomを探して入る
