@@ -26,13 +26,13 @@ public class Main : Photon.MonoBehaviour
 
         energy
             .Where(_=>slider.value <= 1)
-            .Do(_=>Debug.Log(slider.value))
             //現在のenergyの値を10分の１にしてゲージに反映させる
             .Subscribe(x => slider.value = x / 10);
     }
 
     public bool UseEnergy(float useEnergy)
     {
+        Debug.Log(photonView.isMine);
         if (!photonView.isMine) return false;
         if (energy.Value < useEnergy) return false;
         else
