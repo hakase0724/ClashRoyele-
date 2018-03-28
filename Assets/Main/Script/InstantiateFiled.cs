@@ -23,7 +23,7 @@ public class InstantiateFiled : Photon.PunBehaviour
         Debug.Log("RPC" + PhotonNetwork.player.ID);
         if (photonView.isMine)
         {
-            Observable.IntervalFrame(1)
+            Observable.TimerFrame(10)
                 .Subscribe(_=> Instantiate(prefab, pos + new Vector3(0, 1, 0), Quaternion.identity));
         }
         else if(!photonView.isMine) Instantiate(prefab, pos + new Vector3(0,1,0), Quaternion.identity);
