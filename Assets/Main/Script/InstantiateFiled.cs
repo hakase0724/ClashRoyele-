@@ -14,19 +14,19 @@ public class InstantiateFiled : Photon.PunBehaviour
     private void OnClick()
     {
         if (!PhotonNetwork.inRoom) return;       
-        photonView.RPC("RPCTest", PhotonTargets.All, InputToEvent.inputHitPos);
+        photonView.RPC("RPCTest", PhotonTargets.All, InputToEvent.inputHitPos, PhotonNetwork.player.ID);
     }
 
     [PunRPC]
-    private IEnumerator RPCTest(Vector3 pos)
+    private IEnumerator RPCTest(Vector3 pos,int id)
     {
         Debug.Log("RPC" + PhotonNetwork.player.ID);
-        if (photonView.isMine)
+        if (id == PhotonNetwork.player.ID)
         {
             Observable.TimerFrame(10)
                 .Subscribe(_=> Instantiate(prefab, pos + new Vector3(0, 1, 0), Quaternion.identity));
         }
-        else if(!photonView.isMine) Instantiate(prefab, pos + new Vector3(0,1,0), Quaternion.identity);
+        else if(id != PhotonNetwork.player.ID) Instantiate(prefab, pos + new Vector3(0,1,0), Quaternion.identity);
         yield return null;
     }
 	
