@@ -19,11 +19,10 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
     public void Move()
     {
         anim.enabled = true;
-        Vector3 vector;
+        Vector3 vector = new Vector3(0, 0, 1);
         Debug.Log(Camera.main.transform.localEulerAngles.z);
         if (identificationNumber == 0)
         {
-            vector = new Vector3(0, 0, 1);
             if (Camera.main.GetComponent<CameraRotation>().IsRotated)
             {
                 Debug.Log("回転");
@@ -34,7 +33,6 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
         }
         else
         {
-            vector = new Vector3(0, 0, -1);
             if (!Camera.main.GetComponent<CameraRotation>().IsRotated)
             {
                 Debug.Log("回転");
