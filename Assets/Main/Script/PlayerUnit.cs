@@ -19,7 +19,11 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
     {
         anim.enabled = true;
         this.UpdateAsObservable()
-            .Subscribe(_ => rb.velocity = Vector3.forward);
+            .Subscribe(_ => 
+            {
+                if (Camera.main.transform.rotation.z >= 180) rb.velocity = -Vector3.forward;
+                else rb.velocity = Vector3.forward;
+            });
     }
 
     public void MyColor(int id)
