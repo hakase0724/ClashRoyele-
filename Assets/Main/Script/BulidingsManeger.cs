@@ -9,13 +9,15 @@ using static StaticUse;
 public class BulidingsManeger : MonoBehaviour
 {
     //管理している建物のリスト
-    public List<Transform> bulidingsTransform { get; private set; } = new List<Transform>();
+    public List<Transform> myBulidingsTransform { get; private set; } = new List<Transform>();
+    public List<Transform> enemyBulidingsTransform { get; private set; } = new List<Transform>();
     public void EnterList(Transform enterTransform, Component compornent)
     {
         //建物が建物のインターフェイスを持っていれば登録
         if (compornent is IBuilding)
         {
-            bulidingsTransform.Add(enterTransform);
+            myBulidingsTransform.Add(enterTransform);
+            enemyBulidingsTransform.Add(enterTransform);
         }
     }
 
@@ -26,17 +28,17 @@ public class BulidingsManeger : MonoBehaviour
     /// <param name="compornent">建物が持つコンポーネント</param>
     public void EnterList(Transform enterTransform, Component compornent, int id)
     {
-        if (IsSameId(id, PhotonNetwork.player.ID)) return;
         //建物が建物のインターフェイスを持っていれば登録
         if (compornent is IBuilding)
         {
-            bulidingsTransform.Add(enterTransform);
+            if (IsSameId(id, PhotonNetwork.player.ID)) enemyBulidingsTransform.Add(enterTransform);
+            else myBulidingsTransform.Add(enterTransform);
         }
     }
 
     public void ReleaseList(Transform releaseTransform)
     {
-        bulidingsTransform.Remove(releaseTransform);
+        myBulidingsTransform.Remove(releaseTransform);
         Debug.Log(releaseTransform + ":削除");
     }
 }

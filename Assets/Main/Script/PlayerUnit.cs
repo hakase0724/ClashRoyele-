@@ -20,7 +20,7 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
     private IUnit target;
     private IDisposable updateStream;
     private IDisposable intervalStream;
-    //識別番号
+    //識別番号 0=自分.1=自分以外
     private int identificationNumber = 0;
     private Rigidbody rb => GetComponent<Rigidbody>();
     private Animator anim => GetComponent<Animator>();
@@ -31,12 +31,15 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
     public void Move()
     {
         anim.enabled = true;
+        List<Transform> targetTransforms = new List<Transform>();
+        if (identificationNumber == 0) targetTransforms.AddRange(stageScript.GetComponent<BulidingsManeger>().myBulidingsTransform);
+        else targetTransforms.AddRange(stageScript.GetComponent<BulidingsManeger>().enemyBulidingsTransform);
         //一番近い建物を探してその方向を向く
         //transform.LookAt((CalcDistance(transform.position, stageScript.GetComponent<BulidingsManeger>().bulidingsTransform)));
         updateStream = this.UpdateAsObservable()
             .Subscribe(_ => 
             {
-                transform.LookAt((CalcDistance(transform, stageScript.GetComponent<BulidingsManeger>().bulidingsTransform)));
+                transform.LookAt((CalcDistance(transform, targetTransforms)));
                 rb.velocity = transform.forward;
             });
     }
