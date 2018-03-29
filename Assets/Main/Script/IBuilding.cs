@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 建物がもつべきもの
+/// </summary>
 public interface IBuilding
 {
-    //自分の場所を他のオブジェクトに公開
-    Vector3 myPos { get; set; }
+    //自身を管理リストに登録させる
     void EnterTransform();
 }

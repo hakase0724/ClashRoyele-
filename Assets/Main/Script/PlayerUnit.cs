@@ -7,11 +7,15 @@ using UniRx.Triggers;
 using System.Linq;
 using static StaticUse;
 
+/// <summary>
+/// ユニット
+/// </summary>
 public class PlayerUnit : Photon.MonoBehaviour,IUnit
 {
     public float UnitHp { get; set; } = 10;
     public float UnitEnergy { get; set; } = 1;
-    private GameObject stageScript;
+    private GameObject stageScript => GameObject.FindGameObjectWithTag("Main");
+    //識別番号
     private int identificationNumber = 0;
     private Rigidbody rb => GetComponent<Rigidbody>();
     private Animator anim => GetComponent<Animator>();
@@ -19,37 +23,11 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
     [SerializeField]
     private Color[] color = new Color[0];
 
-    private void Start()
-    {
-        stageScript = GameObject.FindGameObjectWithTag("Main");
-        Debug.Log(CalcDistance(transform.position, stageScript.GetComponent<BulidingsManeger>().bulidingsTransform) + "一番近い建物");
-    }
-
     public void Move()
     {
         anim.enabled = true;
+        //一番近い建物を探してその方向を向く
         transform.LookAt((CalcDistance(transform.position, stageScript.GetComponent<BulidingsManeger>().bulidingsTransform)));
-        //Vector3 vector = new Vector3(0, 0, 1);
-        //if (identificationNumber == 0)
-        //{
-        //    if (Camera.main.GetComponent<CameraRotation>().IsRotated)
-        //    {
-        //        Debug.Log("回転");
-        //        transform.Rotate(new Vector3(0, 180, 0));
-        //        vector *= -1;
-        //    }
-            
-        //}
-        //else
-        //{
-        //    if (!Camera.main.GetComponent<CameraRotation>().IsRotated)
-        //    {
-        //        Debug.Log("回転");
-        //        transform.Rotate(new Vector3(0, 180, 0));
-        //        vector *= -1;
-        //    }
-            
-        //}
         this.UpdateAsObservable()
             .Subscribe(_ => rb.velocity = transform.forward);
     }
@@ -58,13 +36,16 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
     {
         Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
         int colorNumber;
+        //生成者が自分か相手か判別
         if (IsSameId(id,PhotonNetwork.player.ID)) colorNumber = 0;
         else colorNumber = 1;
+        //判別結果に応じて識別番号を更新
         identificationNumber = colorNumber;
         foreach (Renderer renderer in renderers)
         {
             renderer.material.color = color[colorNumber];
         }
+        //動き出しを指定時間遅らせる
         const int waitTime = 1;
         Observable.Timer(System.TimeSpan.FromSeconds(waitTime))
             .Subscribe(_ => Move());

@@ -3,21 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 橋
+/// </summary>
 public class Bridge : MonoBehaviour, IBuilding
 {
-    public Vector3 myPos
-    {
-        get
-        {
-            return myPos;
-        }
-
-        set
-        {
-            myPos = this.transform.position;
-        }
-    }
-
     private void Start()
     {
         EnterTransform();

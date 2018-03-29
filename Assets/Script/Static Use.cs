@@ -15,7 +15,7 @@ using System.Linq;
 public static class StaticUse
 {
     /// <summary>
-    /// 指定シーンが読み込まれていないときに指定シーンを追加読み込みする
+    /// 指定シーンが読み込まれていないときに指定シーンをロードする
     /// </summary>
     /// <param name="sceneName">マスターシーンの名前</param>
     public static void SceneLoad(string sceneName)
@@ -47,16 +47,18 @@ public static class StaticUse
     /// <returns></returns>
     public static Transform CalcDistance(Vector3 myPos, List<Transform> transformList)
     {
+        //計算した距離を入れるリスト
         List<float> distances = new List<float>();
+        //距離を計算しリストに格納
         foreach (var b in transformList)
         {
             var d = (myPos - b.transform.position).sqrMagnitude;
-            Debug.Log(d + "," + b);
             distances.Add(d);
         }
-        var maxIdx = distances
+        //最小距離のインデックスを検索する https://qiita.com/Go-zen-chu/items/b546d01fd14ca818d00d ←ここからとったものを改造
+        var minIdx = distances
             .Select((val, idx) => new { V = val, I = idx })
-            .Aggregate((max, working) => (max.V < working.V) ? max : working).I;
-        return transformList[maxIdx];
+            .Aggregate((min, working) => (min.V < working.V) ? min : working).I;
+        return transformList[minIdx];
     }
 }
