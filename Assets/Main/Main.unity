@@ -239,7 +239,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 370aad365770db141861dc494258aac0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 1690591512199924, guid: 982a4f4dc02ed1545aa203967484d788, type: 2}
+  prefab:
+  - {fileID: 1690591512199924, guid: 982a4f4dc02ed1545aa203967484d788, type: 2}
+  - {fileID: 1944564386018634, guid: 6ee46ffdb82c7d94b9fb425cf223fef0, type: 2}
+  - {fileID: 1932291717010252, guid: d22b37706a3ccdb4bb46639cd05f033b, type: 2}
+  - {fileID: 1323787464875026, guid: 2a9d72ce8594a814a85d471b9ccd4630, type: 2}
   instantiateZone: {fileID: 373946974}
 --- !u!114 &191959739
 MonoBehaviour:
@@ -410,12 +414,11 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 191959738}
         m_MethodName: UnitChange
-        m_Mode: 2
+        m_Mode: 3
         m_Arguments:
-          m_ObjectArgument: {fileID: 1932291717010252, guid: d22b37706a3ccdb4bb46639cd05f033b,
-            type: 2}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_IntArgument: 0
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -1191,11 +1194,10 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 191959738}
         m_MethodName: UnitChange
-        m_Mode: 2
+        m_Mode: 3
         m_Arguments:
-          m_ObjectArgument: {fileID: 1690591512199924, guid: 982a4f4dc02ed1545aa203967484d788,
-            type: 2}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -1313,12 +1315,11 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 191959738}
         m_MethodName: UnitChange
-        m_Mode: 2
+        m_Mode: 3
         m_Arguments:
-          m_ObjectArgument: {fileID: 1944564386018634, guid: 6ee46ffdb82c7d94b9fb425cf223fef0,
-            type: 2}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_IntArgument: 0
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 2
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -1884,12 +1885,11 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 191959738}
         m_MethodName: UnitChange
-        m_Mode: 2
+        m_Mode: 3
         m_Arguments:
-          m_ObjectArgument: {fileID: 1323787464875026, guid: 2a9d72ce8594a814a85d471b9ccd4630,
-            type: 2}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_IntArgument: 0
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 3
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
