@@ -32,7 +32,8 @@ public class InstantiateFiled : Photon.PunBehaviour
     [PunRPC]
     protected virtual IEnumerator MyInstantiateRPC(Vector3 pos,int id,float energy)
     {
-        if(!instantiateZone.GetComponent<InstantiateCheck>().IsInstantiateCheck(pos)) yield break;
+        Debug.Log(!instantiateZone.GetComponent<InstantiateCheck>().IsInstantiateCheck(pos, id) + "確認結果");
+        if(!instantiateZone.GetComponent<InstantiateCheck>().IsInstantiateCheck(pos,id)) yield break;
         //生成待機時間
         const int waitFrame = 10;
         //生成者が自分ならwaitFrame分待機
