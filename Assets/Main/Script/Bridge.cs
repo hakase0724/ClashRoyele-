@@ -18,6 +18,7 @@ public class Bridge : MonoBehaviour, IBuilding,IUnit
 
     private void Start()
     {
+        if(gameObject.tag == "Bridge") maneger.EnterList(this.transform, this);
         UnitHp
             .Where(x => x <= 0)
             .Subscribe(_ => Death())

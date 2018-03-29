@@ -10,6 +10,14 @@ public class BulidingsManeger : MonoBehaviour
 {
     //管理している建物のリスト
     public List<Transform> bulidingsTransform { get; private set; } = new List<Transform>();
+    public void EnterList(Transform enterTransform, Component compornent)
+    {
+        //建物が建物のインターフェイスを持っていれば登録
+        if (compornent is IBuilding)
+        {
+            bulidingsTransform.Add(enterTransform);
+        }
+    }
 
     /// <summary>
     /// 建物を管理リストに登録する
