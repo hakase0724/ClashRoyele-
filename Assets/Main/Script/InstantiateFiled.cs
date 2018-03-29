@@ -19,7 +19,7 @@ public class InstantiateFiled : Photon.PunBehaviour
     private void OnClick()
     {
         if (!PhotonNetwork.inRoom) return;
-        photonView.RPC("MyInstantiateRPC", PhotonTargets.All, InputToEvent.inputHitPos, PhotonNetwork.player.ID,main.energy.Value);
+        photonView.RPC("MyInstantiateRPC", PhotonTargets.All,prefab,InputToEvent.inputHitPos, PhotonNetwork.player.ID,main.energy.Value);
         Debug.Log(InputToEvent.inputHitPos + "Filed");
     }
 
@@ -30,7 +30,7 @@ public class InstantiateFiled : Photon.PunBehaviour
     /// <param name="id">生成者ID</param>
     /// <returns></returns>
     [PunRPC]
-    protected virtual IEnumerator MyInstantiateRPC(Vector3 pos,int id,float energy)
+    protected virtual IEnumerator MyInstantiateRPC(GameObject game,Vector3 pos,int id,float energy)
     {
         Debug.Log(!instantiateZone.GetComponent<InstantiateCheck>().IsInstantiateCheck(pos, id) + "確認結果");
         if(!instantiateZone.GetComponent<InstantiateCheck>().IsInstantiateCheck(pos,id)) yield break;
@@ -41,9 +41,9 @@ public class InstantiateFiled : Photon.PunBehaviour
         if (IsSameId(id,PhotonNetwork.player.ID))
         {
             Observable.TimerFrame(waitFrame)
-                .Subscribe(_=> MyInstantiate(prefab, pos + new Vector3(0, 1, 0),id, energy));
+                .Subscribe(_=> MyInstantiate(game, pos + new Vector3(0, 1, 0),id, energy));
         }
-        else MyInstantiate(prefab, pos + new Vector3(0, 1, 0), id,energy);
+        else MyInstantiate(game, pos + new Vector3(0, 1, 0), id,energy);
         yield return null;
     }
 
@@ -58,8 +58,6 @@ public class InstantiateFiled : Photon.PunBehaviour
         var useEnergy = game.GetComponent(typeof(IUnit)) as IUnit;
         if (!main.IsUseEnergy(useEnergy.UnitEnergy,id,energy)) return;
         GameObject gameObject = Instantiate(game, pos, Quaternion.identity);
-        //if (IsSameId(id,PhotonNetwork.player.ID)) gameObject = Instantiate(game, pos, Quaternion.identity);
-        //else gameObject = Instantiate(game, pos, Quaternion.Euler(0,180,0));
         var unit = gameObject.GetComponent(typeof(IUnit)) as IUnit;
         unit.MyColor(id);
     }
