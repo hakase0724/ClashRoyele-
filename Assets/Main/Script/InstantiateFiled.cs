@@ -64,4 +64,8 @@ public class InstantiateFiled : Photon.PunBehaviour
         unit.MyColor(id);
     }
 	
+    public void UnitChange(GameObject unit)
+    {
+        prefab = unit;
+    }
 }
