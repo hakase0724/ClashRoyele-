@@ -45,12 +45,17 @@ public class InstantiateFiled : Photon.PunBehaviour
         const int waitFrame = 10;
         //生成者が自分ならwaitFrame分待機
         //相手なら即時生成
-        if (IsSameId(id,PhotonNetwork.player.ID))
+        if (IsSameId(id, PhotonNetwork.player.ID))
         {
+            Debug.Log("自分で生成");
             Observable.TimerFrame(waitFrame)
-                .Subscribe(_=> MyInstantiate(prefab[num], pos + new Vector3(0, 1, 0),id, energy));
+                .Subscribe(_ => MyInstantiate(prefab[num], pos + new Vector3(0, 1, 0), id, energy));
         }
-        else MyInstantiate(prefab[num], pos + new Vector3(0, 1, 0), id,energy);
+        else
+        {
+            Debug.Log("相手が生成");
+            MyInstantiate(prefab[num], pos + new Vector3(0, 1, 0), id, energy);
+        }
         yield return null;
     }
 
