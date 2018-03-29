@@ -32,15 +32,12 @@ public class Bridge : MonoBehaviour, IBuilding,IUnit
 
     public void MyColor(int id)
     {
-        Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+        Renderer renderer = gameObject.GetComponent<Renderer>();
         int colorNumber;
         //生成者が自分か相手か判別
         if (IsSameId(id, PhotonNetwork.player.ID)) colorNumber = 0;
         else colorNumber = 1;
-        foreach (Renderer renderer in renderers)
-        {
-            renderer.material.color = color[colorNumber];
-        }
+        renderer.material.color = color[colorNumber];
     }
 
     public void Move()

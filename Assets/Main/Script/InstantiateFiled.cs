@@ -13,15 +13,12 @@ using static StaticUse;
 /// </summary>
 public class InstantiateFiled : Photon.PunBehaviour
 {
-    private Main main => GameObject.FindGameObjectWithTag("Main").GetComponent<Main>();
+    protected Main main => GameObject.FindGameObjectWithTag("Main").GetComponent<Main>();
     private int prefabNumber;
-    private int buildingNumber;
     [SerializeField]
     private GameObject[] prefab = new GameObject[0];
     [SerializeField]
     private GameObject instantiateZone;
-    [SerializeField]
-    private GameObject[] myBuildings = new GameObject[0];
 
     private void Awake()
     {
@@ -30,19 +27,6 @@ public class InstantiateFiled : Photon.PunBehaviour
 
     private void Start()
     {
-        List<GameObject> buildings = new List<GameObject>();
-        if (Camera.main.GetComponent<CameraRotation>().IsRotated)
-        {
-            buildings = (from b in myBuildings select b).Skip(3).Take(3).ToList();
-        }
-        else
-        {
-            buildings = (from b in myBuildings select b).Take(3).ToList();
-        }
-        foreach(var b in buildings)
-        {
-            photonView.RPC("MyInstantiateRPC", PhotonTargets.All, prefabNumber, b.transform.position, PhotonNetwork.player.ID, main.energy.Value);
-        }
         this.UpdateAsObservable()
             .Where(_ => Input.GetKeyDown(KeyCode.C))
             .Subscribe(_ => photonView.RPC("RPCTest", PhotonTargets.All));
