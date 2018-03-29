@@ -6,15 +6,20 @@ using UniRx;
 using UniRx.Triggers;
 using System.Linq;
 using static StaticUse;
+using System;
 
 /// <summary>
 /// ユニット
 /// </summary>
 public class PlayerUnit : Photon.MonoBehaviour,IUnit
 {
-    public float UnitHp { get; set; } = 10;
+    public FloatReactiveProperty UnitHp { get; set; } = new FloatReactiveProperty(10);
     public float UnitEnergy { get; set; } = 1;
     private GameObject stageScript => GameObject.FindGameObjectWithTag("Main");
+    private GameObject targetObject;
+    private IUnit target;
+    private IDisposable updateStream;
+    private IDisposable intervalStream;
     //識別番号
     private int identificationNumber = 0;
     private Rigidbody rb => GetComponent<Rigidbody>();
@@ -27,9 +32,13 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
     {
         anim.enabled = true;
         //一番近い建物を探してその方向を向く
-        transform.LookAt((CalcDistance(transform.position, stageScript.GetComponent<BulidingsManeger>().bulidingsTransform)));
-        this.UpdateAsObservable()
-            .Subscribe(_ => rb.velocity = transform.forward);
+        //transform.LookAt((CalcDistance(transform.position, stageScript.GetComponent<BulidingsManeger>().bulidingsTransform)));
+        updateStream = this.UpdateAsObservable()
+            .Subscribe(_ => 
+            {
+                transform.LookAt((CalcDistance(transform, stageScript.GetComponent<BulidingsManeger>().bulidingsTransform)));
+                rb.velocity = transform.forward;
+            });
     }
 
     public void MyColor(int id)
@@ -53,11 +62,37 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
 
     public void Attack(float attack)
     {
-
+        const int attackInterval = 1;
+        updateStream.Dispose();
+        rb.velocity = Vector3.zero;
+        intervalStream = Observable.Interval(System.TimeSpan.FromSeconds(attackInterval)).Subscribe(_=> target.Damage(attack));
+        target.UnitHp
+            .Where(x => x <= 0)
+            .Subscribe(_ => 
+            {
+                intervalStream.Dispose();
+                Move();
+            })
+            .AddTo(targetObject);
     }
 
     public void Damage(float damage)
     {
 
+    }
+
+    public void Death()
+    {
+
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("相手:" + other.gameObject.name + "自分:" + gameObject.name);
+        if(other.gameObject.GetComponent(typeof(IUnit)) as IUnit != null)
+        {
+            targetObject = other.gameObject;
+            target = targetObject.GetComponent(typeof(IUnit)) as IUnit;
+            Attack(10f);            
+        }
     }
 }

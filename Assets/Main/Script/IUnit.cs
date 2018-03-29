@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UniRx;
 
 /// <summary>
 /// ユニットが持つべきもの
@@ -8,7 +9,7 @@ using UnityEngine;
 public interface IUnit
 {
     //ユニットの体力
-    float UnitHp { get;set;}
+    FloatReactiveProperty UnitHp { get;set;}
     //ユニット生成時のコスト
     float UnitEnergy { get; set; }
     /// <summary>
@@ -30,4 +31,5 @@ public interface IUnit
     /// </summary>
     /// <param name="damage">受けるダメージ</param>
     void Damage(float damage);
+    void Death();
 }

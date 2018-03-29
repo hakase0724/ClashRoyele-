@@ -21,9 +21,11 @@ public class Master : Photon.PunBehaviour
 
     private void Start()
     {
+        const int playMemberNum = 2;
+
         this.UpdateAsObservable()
             .Select(x => PhotonNetwork.playerList.Length)
-            .Where(x => x >= 2)
+            .Where(x => x >= playMemberNum)
             .Subscribe(_ => SceneLoad("Main"));
     }
     

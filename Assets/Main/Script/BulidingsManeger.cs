@@ -23,4 +23,10 @@ public class BulidingsManeger : MonoBehaviour
             bulidingsTransform.Add(enterTransform);
         }
     }
+
+    public void ReleaseList(Transform releaseTransform)
+    {
+        bulidingsTransform.Remove(releaseTransform);
+        Debug.Log(releaseTransform + ":削除");
+    }
 }
