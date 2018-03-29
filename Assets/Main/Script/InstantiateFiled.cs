@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon;
 using UniRx;
+using UniRx.Triggers;
 using static StaticUse;
 
 /// <summary>
@@ -23,11 +24,23 @@ public class InstantiateFiled : Photon.PunBehaviour
         prefabNumber = 0;
     }
 
+    private void Start()
+    {
+        this.UpdateAsObservable()
+            .Where(_ => Input.GetKeyDown(KeyCode.C))
+            .Subscribe(_ => photonView.RPC("RPCTest", PhotonTargets.All));
+    }
+
     private void OnClick()
     {
         if (!PhotonNetwork.inRoom) return;
-        photonView.RPC("MyInstantiateRPC", PhotonTargets.All,prefabNumber,InputToEvent.inputHitPos, PhotonNetwork.player.ID,main.energy.Value);
-        Debug.Log(InputToEvent.inputHitPos + "Filed");
+        photonView.RPC("MyInstantiateRPC", PhotonTargets.All,prefabNumber, InputToEvent.inputHitPos, PhotonNetwork.player.ID,main.energy.Value);
+    }
+
+    [PunRPC]
+    private void RPCTest()
+    {
+        Debug.Log("RPCCall!" + PhotonNetwork.player.ID);
     }
 
     /// <summary>
