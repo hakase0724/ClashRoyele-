@@ -16,6 +16,7 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
     public FloatReactiveProperty UnitHp { get; set; } = new FloatReactiveProperty(10);
     public float UnitEnergy { get; set; } = 1;
     private GameObject stageScript => GameObject.FindGameObjectWithTag("Main");
+    private CameraRotation camera => Camera.main.GetComponent<CameraRotation>();
     private GameObject targetObject;
     private IUnit target;
     private IDisposable updateStream;
@@ -34,12 +35,13 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
         List<Transform> targetTransforms = new List<Transform>();
         if (identificationNumber == 0) targetTransforms.AddRange(stageScript.GetComponent<BulidingsManeger>().myBulidingsTransform);
         else targetTransforms.AddRange(stageScript.GetComponent<BulidingsManeger>().enemyBulidingsTransform);
+        var nextTarget = CalcDistance(transform, targetTransforms, camera.IsRotated);
+        Debug.Log(nextTarget);
         //一番近い建物を探してその方向を向く
-        //transform.LookAt((CalcDistance(transform.position, stageScript.GetComponent<BulidingsManeger>().bulidingsTransform)));
         updateStream = this.UpdateAsObservable()
             .Subscribe(_ => 
             {
-                transform.LookAt((CalcDistance(transform, targetTransforms)));
+                transform.LookAt(nextTarget);
                 rb.velocity = transform.forward;
             });
     }
