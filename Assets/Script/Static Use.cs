@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UniRx;
 using UniRx.Triggers;
+using System.Linq;
 
 
 /// <summary>
@@ -36,5 +37,26 @@ public static class StaticUse
         if (receivedId == myId) result = true;
         else result = false;
         return result;
+    }
+
+    /// <summary>
+    /// 距離を計算し最も近い建物のTransformを返す
+    /// </summary>
+    /// <param name="myPos">自分の場所</param>
+    /// <param name="transformList">建物のTransformのリスト</param>
+    /// <returns></returns>
+    public static Transform CalcDistance(Vector3 myPos, List<Transform> transformList)
+    {
+        List<float> distances = new List<float>();
+        foreach (var b in transformList)
+        {
+            var d = (myPos - b.transform.position).sqrMagnitude;
+            Debug.Log(d + "," + b);
+            distances.Add(d);
+        }
+        var maxIdx = distances
+            .Select((val, idx) => new { V = val, I = idx })
+            .Aggregate((max, working) => (max.V < working.V) ? max : working).I;
+        return transformList[maxIdx];
     }
 }

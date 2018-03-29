@@ -4,45 +4,54 @@ using UnityEngine;
 using Photon;
 using UniRx;
 using UniRx.Triggers;
+using System.Linq;
 using static StaticUse;
 
 public class PlayerUnit : Photon.MonoBehaviour,IUnit
 {
     public float UnitHp { get; set; } = 10;
     public float UnitEnergy { get; set; } = 1;
+    private GameObject stageScript;
     private int identificationNumber = 0;
     private Rigidbody rb => GetComponent<Rigidbody>();
     private Animator anim => GetComponent<Animator>();
+    private List<Transform> buildingTransforms = new List<Transform>();
     [SerializeField]
     private Color[] color = new Color[0];
+
+    private void Start()
+    {
+        stageScript = GameObject.FindGameObjectWithTag("Main");
+        Debug.Log(CalcDistance(transform.position, stageScript.GetComponent<BulidingsManeger>().bulidingsTransform) + "一番近い建物");
+    }
 
     public void Move()
     {
         anim.enabled = true;
-        Vector3 vector = new Vector3(0, 0, 1);
-        Debug.Log(Camera.main.transform.localEulerAngles.z);
-        if (identificationNumber == 0)
-        {
-            if (Camera.main.GetComponent<CameraRotation>().IsRotated)
-            {
-                Debug.Log("回転");
-                transform.Rotate(new Vector3(0, 180, 0));
-                vector *= -1;
-            }
+        transform.LookAt((CalcDistance(transform.position, stageScript.GetComponent<BulidingsManeger>().bulidingsTransform)));
+        //Vector3 vector = new Vector3(0, 0, 1);
+        //if (identificationNumber == 0)
+        //{
+        //    if (Camera.main.GetComponent<CameraRotation>().IsRotated)
+        //    {
+        //        Debug.Log("回転");
+        //        transform.Rotate(new Vector3(0, 180, 0));
+        //        vector *= -1;
+        //    }
             
-        }
-        else
-        {
-            if (!Camera.main.GetComponent<CameraRotation>().IsRotated)
-            {
-                Debug.Log("回転");
-                transform.Rotate(new Vector3(0, 180, 0));
-                vector *= -1;
-            }
+        //}
+        //else
+        //{
+        //    if (!Camera.main.GetComponent<CameraRotation>().IsRotated)
+        //    {
+        //        Debug.Log("回転");
+        //        transform.Rotate(new Vector3(0, 180, 0));
+        //        vector *= -1;
+        //    }
             
-        }
+        //}
         this.UpdateAsObservable()
-            .Subscribe(_ => rb.velocity = vector);
+            .Subscribe(_ => rb.velocity = transform.forward);
     }
 
     public void MyColor(int id)
