@@ -29,6 +29,9 @@ public class InstantiateFiled : Photon.PunBehaviour
         this.UpdateAsObservable()
             .Where(_ => Input.GetKeyDown(KeyCode.C))
             .Subscribe(_ => photonView.RPC("RPCTest", PhotonTargets.All));
+        this.UpdateAsObservable()
+            .Where(_ => Input.GetKeyDown(KeyCode.M))
+            .Subscribe(_ => Debug.Log(PhotonNetwork.playerList.Length));
     }
 
     private void OnClick()
