@@ -8,6 +8,6 @@ using UnityEngine;
 public interface IBuilding
 {
     //自身を管理リストに登録させる
-    void EnterTransform();
+    void EnterTransform(int id);
     void ReleaseTransform();
 }

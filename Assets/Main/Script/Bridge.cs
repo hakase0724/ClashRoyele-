@@ -18,26 +18,27 @@ public class Bridge : MonoBehaviour, IBuilding,IUnit
 
     private void Start()
     {
-        EnterTransform();
         UnitHp
             .Where(x => x <= 0)
             .Subscribe(_ => Death())
             .AddTo(gameObject);
     }
 
-    public void EnterTransform()
+    public void EnterTransform(int id)
     {
-        maneger.EnterList(this.transform, this);
+        maneger.EnterList(this.transform, this,id);
     }
 
     public void MyColor(int id)
     {
+        Debug.Log("受け取ったID:" + id + ",自分のID:" + PhotonNetwork.player.ID + ",生成場所：" +transform.position);
         Renderer renderer = gameObject.GetComponent<Renderer>();
         int colorNumber;
         //生成者が自分か相手か判別
         if (IsSameId(id, PhotonNetwork.player.ID)) colorNumber = 0;
         else colorNumber = 1;
         renderer.material.color = color[colorNumber];
+        EnterTransform(id);
     }
 
     public void Move()

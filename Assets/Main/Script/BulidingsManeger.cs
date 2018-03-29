@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static StaticUse;
 
 /// <summary>
 /// 建物管理
@@ -15,8 +16,9 @@ public class BulidingsManeger : MonoBehaviour
     /// </summary>
     /// <param name="enterTransform">登録する建物</param>
     /// <param name="compornent">建物が持つコンポーネント</param>
-    public void EnterList(Transform enterTransform,Component compornent)
+    public void EnterList(Transform enterTransform, Component compornent, int id)
     {
+        if (IsSameId(id, PhotonNetwork.player.ID)) return;
         //建物が建物のインターフェイスを持っていれば登録
         if (compornent is IBuilding)
         {
