@@ -22,8 +22,8 @@ GameObject:
   - component: {fileID: 33674265937316582}
   - component: {fileID: 65548785759499654}
   - component: {fileID: 23312174874210708}
-  - component: {fileID: 114634046850341762}
   - component: {fileID: 114081120958791890}
+  - component: {fileID: 114252796771710682}
   m_Layer: 0
   m_Name: MyCenter
   m_TagString: Untagged
@@ -123,7 +123,7 @@ MonoBehaviour:
   instantiationId: -1
   currentMasterID: -1
   isRuntimeInstantiated: 0
---- !u!114 &114634046850341762
+--- !u!114 &114252796771710682
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -131,7 +131,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1731148782207906}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2cfe34dd646ae6840bb18392535a9ea6, type: 3}
+  m_Script: {fileID: 11500000, guid: 67884d9db8af24c469189479862d1117, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   color:

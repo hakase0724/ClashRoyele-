@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UniRx;
 using UniRx.Triggers;
@@ -12,6 +13,7 @@ public class Main : Photon.MonoBehaviour
     public FloatReactiveProperty energy { get; private set; } = new FloatReactiveProperty(3);
     //プレイヤーデータをやり取りするための領域
     public PlayerData playerData { get; private set; }
+    public IntReactiveProperty enemyCount { get; private set; } = new IntReactiveProperty(0);
     //エネルギーを表示するバー
     [SerializeField]
     private Slider slider;
@@ -32,6 +34,24 @@ public class Main : Photon.MonoBehaviour
             .Where(_=>slider.value <= 1)
             //現在のenergyの値を10分の１にしてゲージに反映させる
             .Subscribe(x => slider.value = x / 10);
+
+        enemyCount
+            .Do(x=>Debug.Log(x))
+            .Buffer(2,1)
+            .Do(x => Debug.Log(x))
+            .Select(x => x.Last())
+            .Do(x => Debug.Log(x))
+            .Where(x => x <= 0)
+            .Do(x => Debug.Log(x))
+            .Subscribe(_ => End())
+            .AddTo(gameObject);
+    }
+
+    private void End()
+    {
+        SceneLoad("Master");
+        PhotonNetwork.LeaveRoom();
+        PhotonNetwork.Disconnect();
     }
 
     /// <summary>
@@ -57,5 +77,10 @@ public class Main : Photon.MonoBehaviour
         //相手のエネルギーが足りていなければ
         else if (enemyEnergy < useEnergy) return false;
         else return true;
+    }
+
+    public void EnemyCount(int value)
+    {
+        enemyCount.Value += value;
     }
 }

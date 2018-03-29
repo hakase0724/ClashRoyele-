@@ -57,8 +57,10 @@ public static class StaticUse
             distances.Add(d);
         }
         //最小距離のインデックスを検索する https://qiita.com/Go-zen-chu/items/b546d01fd14ca818d00d ←ここからとったものを改造
+        float ignoreDistance = 10f;
         var minIdx = distances
             .Select((val, idx) => new { V = val, I = idx })
+            .Where((min,working) => min.V > ignoreDistance)
             .Aggregate((min, working) => (min.V < working.V) ? min : working).I;
         return transformList[minIdx];
     }
