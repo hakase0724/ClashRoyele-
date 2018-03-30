@@ -11,8 +11,10 @@ using System;
 /// <summary>
 /// ユニット
 /// </summary>
-public class PlayerUnit : Photon.MonoBehaviour,IUnit
+public class PlayerUnit : Photon.MonoBehaviour, IUnit
 {
+    public BoolReactiveProperty isMine { get; set; } = new BoolReactiveProperty();
+    public BoolReactiveProperty isAlive { get; set; } = new BoolReactiveProperty(true);
     public FloatReactiveProperty UnitHp { get; set; } = new FloatReactiveProperty(10);
     public float UnitEnergy { get; set; } = 1;
     private GameObject stageScript => GameObject.FindGameObjectWithTag("Main");
@@ -26,26 +28,59 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
     private int identificationNumber = 0;
     private Rigidbody rb => GetComponent<Rigidbody>();
     private Animator anim => GetComponent<Animator>();
-    private List<Transform> buildingTransforms = new List<Transform>();
     [SerializeField]
     private Color[] color = new Color[0];
 
     public void Move()
     {
         anim.enabled = true;
-        List<Transform> targetTransforms = new List<Transform>();
-        if(nextTargetTransform == null) targetTransforms.AddRange(stageScript.GetComponent<BulidingsManeger>().bridgesTransform);
-        else if (identificationNumber == 0) targetTransforms.AddRange(stageScript.GetComponent<BulidingsManeger>().myBulidingsTransform);
-        else targetTransforms.AddRange(stageScript.GetComponent<BulidingsManeger>().enemyBulidingsTransform);
+        //対象のリスト
+        List<GameObject> targetList = new List<GameObject>();
+        if (targetObject == null) targetList.AddRange(stageScript.GetComponent<BulidingsManeger>().bridges);
+        else if (identificationNumber == 0) targetList.AddRange(stageScript.GetComponent<BulidingsManeger>().myBulidings);
+        else targetList.AddRange(stageScript.GetComponent<BulidingsManeger>().enemyBulidings);
         //一番近い建物を探してその方向を向く
-        nextTargetTransform = CalcDistance(transform, targetTransforms, camera.IsRotated);
-        Debug.Log("次に向かう対象：" + nextTargetTransform);
+        targetObject = CalcDistance(gameObject, targetList, camera.IsRotated);
+        target = targetObject.GetComponent(typeof(IUnit)) as IUnit;
+        var t = TargetLock();
         updateStream = this.UpdateAsObservable()
-            .Subscribe(_ => 
+            .Subscribe(_ =>
             {
-                transform.LookAt(nextTargetTransform);
+                transform.LookAt(targetObject.transform);
                 rb.velocity = transform.forward;
             });
+    }
+
+    private GameObject TargetLock()
+    {
+        Debug.Log("TargetLock Called!");
+        const float viewAngle = 60.0f;
+        Debug.Log("向き宣言");
+        Vector3 viewVector = Vector3.forward;
+        
+        //対象のリスト
+        List<GameObject> targetList = new List<GameObject>();
+        Debug.Log("リスト更新");
+        if (targetObject == null) targetList.AddRange(stageScript.GetComponent<BulidingsManeger>().bridges);
+        else if (identificationNumber == 0) targetList.AddRange(stageScript.GetComponent<BulidingsManeger>().myBulidings);
+        else targetList.AddRange(stageScript.GetComponent<BulidingsManeger>().enemyBulidings);
+        Debug.Log("リスト制作");
+        var lockOnList =
+            (from lockOn in targetList
+             where Vector3.Angle((lockOn.transform.position - this.transform.position).normalized, viewVector) <= viewAngle
+             select lockOn).ToList();
+        Debug.Log("ログ表示");
+        if (lockOnList.Count <= 0)
+        {
+            Debug.Log("ロックオンしたオブジェクトの数" + lockOnList.Count);
+            return null;
+        }
+        foreach (var l in lockOnList)
+        {
+            Debug.Log("ロックオンしたオブジェクト" + l);
+        }
+        return null;
+             
     }
 
     public void MyColor(int id)
@@ -53,8 +88,16 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
         Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
         int colorNumber;
         //生成者が自分か相手か判別
-        if (IsSameId(id,PhotonNetwork.player.ID)) colorNumber = 0;
-        else colorNumber = 1;
+        if (IsSameId(id, PhotonNetwork.player.ID))
+        {
+            colorNumber = 0;
+            isMine.Value = true;
+        }
+        else
+        {
+            colorNumber = 1;
+            isMine.Value = false;
+        }
         //判別結果に応じて識別番号を更新
         identificationNumber = colorNumber;
         foreach (Renderer renderer in renderers)
@@ -67,39 +110,58 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
             .Subscribe(_ => Move());
     }
 
-    public void Attack(float attack)
+    public void Attack(float attack,GameObject attackTarget)
     {
+        //攻撃間隔
         const int attackInterval = 1;
+        //攻撃対象のIUnit付きコンポーネントを取得
+        var attackTargetInterface = attackTarget.GetComponent(typeof(IUnit)) as IUnit;
+        //攻撃時には動きを止める
         updateStream.Dispose();
         rb.velocity = Vector3.zero;
-        intervalStream = Observable.Interval(System.TimeSpan.FromSeconds(attackInterval)).Subscribe(_=> target.Damage(attack));
-        target.UnitHp
+        //攻撃間隔ごとに攻撃し相手のDamageメソッドを呼び出す
+        intervalStream = Observable.Interval(System.TimeSpan.FromSeconds(attackInterval))
+            .Subscribe(_ => attackTargetInterface.Damage(attack));
+        //対象の体力を監視し体力がなくなったら攻撃をやめ、移動する
+        attackTargetInterface.UnitHp
             .Where(x => x <= 0)
-            .Subscribe(_ => 
+            .Subscribe(_ =>
             {
                 intervalStream.Dispose();
                 Move();
             })
-            .AddTo(targetObject);
+            .AddTo(gameObject);
     }
 
     public void Damage(float damage)
     {
-
+        UnitHp.Value -= damage;
     }
 
     public void Death()
     {
-
+        isAlive.Value = false;
     }
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("相手:" + other.gameObject.name + "自分:" + gameObject.name);
-        if(other.gameObject.GetComponent(typeof(IUnit)) as IUnit != null)
-        {
-            targetObject = other.gameObject;
-            target = targetObject.GetComponent(typeof(IUnit)) as IUnit;
-            Attack(10f);            
-        }
+        //対象のIUnit付きコンポーネントを取得
+        var otherUnit = other.gameObject.GetComponent(typeof(IUnit)) as IUnit;
+        //ユニットでなければ
+        if (otherUnit == null) return;
+        //相手と自分の生成者が同一であれば
+        if (otherUnit.isMine.Value == isMine.Value) return;
+        //相手の体力があれば
+        if (otherUnit.UnitHp.Value > 0) Attack(10f, other.gameObject);
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        //対象のIUnit付きコンポーネントを取得
+        var otherUnit = other.gameObject.GetComponent(typeof(IUnit)) as IUnit;
+        //ユニットでなければ
+        if (otherUnit == null) return;
+        //相手と自分の生成者が同一であれば
+        if (otherUnit.isMine.Value == isMine.Value) return;
+        Move();
     }
 }

@@ -7,6 +7,8 @@ using static StaticUse;
 
 public class Tower : MonoBehaviour, IBuilding, IUnit
 {
+    public BoolReactiveProperty isMine { get; set; } = new BoolReactiveProperty();
+    public BoolReactiveProperty isAlive { get; set; } = new BoolReactiveProperty(true);
     public float UnitEnergy { get; set; } = 0;
     public FloatReactiveProperty UnitHp { get; set; } = new FloatReactiveProperty(10);
     private Main main => GameObject.FindGameObjectWithTag("Main").GetComponent<Main>();
@@ -18,7 +20,7 @@ public class Tower : MonoBehaviour, IBuilding, IUnit
 
     private void Start()
     {
-        if (identificationNumber != 0) main.EnemyCount(1);
+        if (!isMine.Value) main.EnemyCount(1);
         EnterTransform();
         UnitHp
             .Where(x => x <= 0)
@@ -26,7 +28,7 @@ public class Tower : MonoBehaviour, IBuilding, IUnit
             .AddTo(gameObject);
     }
 
-    public void Attack(float attack)
+    public void Attack(float attack,GameObject attackTarget)
     {
         
     }
@@ -39,12 +41,13 @@ public class Tower : MonoBehaviour, IBuilding, IUnit
     public void Death()
     {
         ReleaseTransform();
+        isAlive.Value = false;
         gameObject.SetActive(false);
     }
 
     public void EnterTransform()
     {
-        maneger.EnterList(this.transform, this, identificationNumber);
+        maneger.EnterList(this.gameObject, this, identificationNumber);
     }
 
     public void Move()
@@ -57,8 +60,16 @@ public class Tower : MonoBehaviour, IBuilding, IUnit
         Renderer renderer = gameObject.GetComponent<Renderer>();
         int colorNumber;
         //生成者が自分か相手か判別
-        if (IsSameId(id, PhotonNetwork.player.ID)) colorNumber = 0;
-        else colorNumber = 1;
+        if (IsSameId(id, PhotonNetwork.player.ID))
+        {
+            colorNumber = 0;
+            isMine.Value = true;
+        }
+        else
+        {
+            colorNumber = 1;
+            isMine.Value = false;
+        }
         //判別結果に応じて識別番号を更新
         identificationNumber = colorNumber;
         renderer.material.color = color[colorNumber];
@@ -66,7 +77,7 @@ public class Tower : MonoBehaviour, IBuilding, IUnit
 
     public void ReleaseTransform()
     {
-        maneger.ReleaseList(this.transform);
-        if (identificationNumber != 0) main.EnemyCount(-1);
+        maneger.ReleaseList(this.gameObject);
+        if (!isMine.Value) main.EnemyCount(-1);
     }
 }

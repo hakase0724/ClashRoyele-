@@ -8,6 +8,8 @@ using UniRx;
 /// </summary>
 public interface IUnit
 {
+    BoolReactiveProperty isMine { get; set; }
+    BoolReactiveProperty isAlive { get; set; }
     //ユニットの体力
     FloatReactiveProperty UnitHp { get;set;}
     //ユニット生成時のコスト
@@ -25,7 +27,7 @@ public interface IUnit
     /// 自機の攻撃
     /// </summary>
     /// <param name="attack">攻撃力</param>
-    void Attack(float attack);
+    void Attack(float attack,GameObject attackTarget);
     /// <summary>
     /// ダメージを受ける
     /// </summary>

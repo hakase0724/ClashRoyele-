@@ -58,43 +58,6 @@ public static class StaticUse
             distance = (myPos.position - b.transform.position).sqrMagnitude;
             target.Add(b);
             distances.Add(distance);
-            
-            //if (myPos.position.z < 0)
-            //{
-            //    if (myPos.position.z <= b.transform.position.z)
-            //    {
-            //        distance = (myPos.position - b.transform.position).sqrMagnitude;
-            //        target.Add(b);
-            //        distances.Add(distance);
-            //    }
-            //}
-            //else if(myPos.position.z > 0)
-            //{
-            //    if (myPos.position.z >= b.transform.position.z)
-            //    {
-            //        distance = (myPos.position - b.transform.position).sqrMagnitude;
-            //        target.Add(b);
-            //        distances.Add(distance);
-            //    }
-            //}
-            //if (!isAhead)
-            //{
-            //    if (myPos.position.z <= b.transform.position.z)
-            //    {
-            //        distance = (myPos.position - b.transform.position).sqrMagnitude;
-            //        target.Add(b);
-            //        distances.Add(distance);
-            //    }
-            //}
-            //else if (isAhead)
-            //{
-            //    if (myPos.position.z >= b.transform.position.z)
-            //    {
-            //        distance = (myPos.position - b.transform.position).sqrMagnitude;
-            //        target.Add(b);
-            //        distances.Add(distance);
-            //    }
-            //}
         }
         //最小距離のインデックスを検索する https://qiita.com/Go-zen-chu/items/b546d01fd14ca818d00d ←ここからとったものを改造
         float ignoreDistance = 2f;
@@ -103,5 +66,32 @@ public static class StaticUse
             .Where((min,working) => min.V > ignoreDistance * ignoreDistance)
             .Aggregate((min, working) => (min.V < working.V) ? min : working).I;
         return transformList[minIdx];
+    }
+
+    /// <summary>
+    /// 距離を計算し最も近い建物のTransformを返す
+    /// </summary>
+    /// <param name="me">自分の場所</param>
+    /// <param name="targetList">建物のTransformのリスト</param>
+    /// <returns></returns>
+    public static GameObject CalcDistance(GameObject me, List<GameObject> targetList, bool isAhead)
+    {
+        if (targetList.Count <= 0) return me;
+        //計算した距離を入れるリスト
+        List<float> distances = new List<float>();
+        //距離を計算しリストに格納
+        foreach (var b in targetList)
+        {
+            float distance;
+            distance = (me.transform.position - b.transform.position).sqrMagnitude;
+            distances.Add(distance);
+        }
+        //最小距離のインデックスを検索する https://qiita.com/Go-zen-chu/items/b546d01fd14ca818d00d ←ここからとったものを改造
+        float ignoreDistance = 2f;
+        var minIdx = distances
+            .Select((val, idx) => new { V = val, I = idx })
+            .Where((min, working) => min.V > ignoreDistance * ignoreDistance)
+            .Aggregate((min, working) => (min.V < working.V) ? min : working).I;
+        return targetList[minIdx];
     }
 }
