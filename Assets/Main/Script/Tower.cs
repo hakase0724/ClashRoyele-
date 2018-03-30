@@ -54,7 +54,6 @@ public class Tower : MonoBehaviour, IBuilding, IUnit
 
     public void MyColor(int id)
     {
-        Debug.Log("受け取ったID:" + id + ",自分のID:" + PhotonNetwork.player.ID + ",生成場所：" + transform.position);
         Renderer renderer = gameObject.GetComponent<Renderer>();
         int colorNumber;
         //生成者が自分か相手か判別
@@ -67,6 +66,7 @@ public class Tower : MonoBehaviour, IBuilding, IUnit
 
     public void ReleaseTransform()
     {
+        maneger.ReleaseList(this.transform);
         if (identificationNumber != 0) main.EnemyCount(-1);
     }
 }

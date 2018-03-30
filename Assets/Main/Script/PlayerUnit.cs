@@ -18,6 +18,7 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
     private GameObject stageScript => GameObject.FindGameObjectWithTag("Main");
     private CameraRotation camera => Camera.main.GetComponent<CameraRotation>();
     private GameObject targetObject;
+    private Transform nextTargetTransform;
     private IUnit target;
     private IDisposable updateStream;
     private IDisposable intervalStream;
@@ -33,15 +34,16 @@ public class PlayerUnit : Photon.MonoBehaviour,IUnit
     {
         anim.enabled = true;
         List<Transform> targetTransforms = new List<Transform>();
-        if (identificationNumber == 0) targetTransforms.AddRange(stageScript.GetComponent<BulidingsManeger>().myBulidingsTransform);
+        if(nextTargetTransform == null) targetTransforms.AddRange(stageScript.GetComponent<BulidingsManeger>().bridgesTransform);
+        else if (identificationNumber == 0) targetTransforms.AddRange(stageScript.GetComponent<BulidingsManeger>().myBulidingsTransform);
         else targetTransforms.AddRange(stageScript.GetComponent<BulidingsManeger>().enemyBulidingsTransform);
-        var nextTarget = CalcDistance(transform, targetTransforms, camera.IsRotated);
-        Debug.Log(nextTarget);
         //一番近い建物を探してその方向を向く
+        nextTargetTransform = CalcDistance(transform, targetTransforms, camera.IsRotated);
+        Debug.Log("次に向かう対象：" + nextTargetTransform);
         updateStream = this.UpdateAsObservable()
             .Subscribe(_ => 
             {
-                transform.LookAt(nextTarget);
+                transform.LookAt(nextTargetTransform);
                 rb.velocity = transform.forward;
             });
     }

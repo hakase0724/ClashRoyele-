@@ -55,24 +55,28 @@ public static class StaticUse
         foreach (var b in transformList)
         {
             float distance;
-            if (myPos.position.z < 0)
-            {
-                if (myPos.position.z <= b.transform.position.z)
-                {
-                    distance = (myPos.position - b.transform.position).sqrMagnitude;
-                    target.Add(b);
-                    distances.Add(distance);
-                }
-            }
-            else if(myPos.position.z > 0)
-            {
-                if (myPos.position.z >= b.transform.position.z)
-                {
-                    distance = (myPos.position - b.transform.position).sqrMagnitude;
-                    target.Add(b);
-                    distances.Add(distance);
-                }
-            }
+            distance = (myPos.position - b.transform.position).sqrMagnitude;
+            target.Add(b);
+            distances.Add(distance);
+            
+            //if (myPos.position.z < 0)
+            //{
+            //    if (myPos.position.z <= b.transform.position.z)
+            //    {
+            //        distance = (myPos.position - b.transform.position).sqrMagnitude;
+            //        target.Add(b);
+            //        distances.Add(distance);
+            //    }
+            //}
+            //else if(myPos.position.z > 0)
+            //{
+            //    if (myPos.position.z >= b.transform.position.z)
+            //    {
+            //        distance = (myPos.position - b.transform.position).sqrMagnitude;
+            //        target.Add(b);
+            //        distances.Add(distance);
+            //    }
+            //}
             //if (!isAhead)
             //{
             //    if (myPos.position.z <= b.transform.position.z)

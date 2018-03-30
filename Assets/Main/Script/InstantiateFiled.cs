@@ -30,9 +30,6 @@ public class InstantiateFiled : Photon.PunBehaviour
         this.UpdateAsObservable()
             .Where(_ => Input.GetKeyDown(KeyCode.C))
             .Subscribe(_ => photonView.RPC("RPCTest", PhotonTargets.All));
-        this.UpdateAsObservable()
-            .Where(_ => Input.GetKeyDown(KeyCode.M))
-            .Subscribe(_ => Debug.Log(PhotonNetwork.playerList.Length));
     }
 
     private void OnClick()
@@ -64,13 +61,11 @@ public class InstantiateFiled : Photon.PunBehaviour
         //相手なら即時生成
         if (IsSameId(id, PhotonNetwork.player.ID))
         {
-            Debug.Log("自分で生成");
             Observable.TimerFrame(waitFrame)
                 .Subscribe(_ => MyInstantiate(prefab[num], pos + new Vector3(0, 1, 0), id, energy));
         }
         else
         {
-            Debug.Log("相手が生成");
             MyInstantiate(prefab[num], pos + new Vector3(0, 1, 0), id, energy);
         }
         yield return null;

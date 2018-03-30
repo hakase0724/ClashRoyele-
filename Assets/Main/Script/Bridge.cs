@@ -26,8 +26,7 @@ public class Bridge : MonoBehaviour, IBuilding,IUnit
 
     public void EnterTransform()
     {
-        maneger.EnterList(this.transform, this,0);
-        maneger.EnterList(this.transform, this,1);
+        maneger.EnterList(this.transform, this);
     }
 
     public void MyColor(int id)

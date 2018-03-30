@@ -18,6 +18,18 @@ public class Master : Photon.PunBehaviour
     private GameObject inputCanvas;
     [SerializeField]
     private GameObject waitCanvas;
+    [SerializeField]
+    private GameObject waitCanvas2;
+
+    private void Awake()
+    {
+        if (PhotonNetwork.inRoom)
+        {
+            inputCanvas.SetActive(false);
+            waitCanvas2.SetActive(true);
+            Debug.Log("部屋の中の自分の名前" + PhotonNetwork.playerName);
+        }
+    }
 
     private void Start()
     {

@@ -13,9 +13,7 @@ public class InstantiateCheck : Photon.MonoBehaviour
 
     public void Click()
     {
-        Debug.Log(InputToEvent.inputHitPos + "Panel");
         inputPonit = InputToEvent.inputHitPos;
-        Debug.Log("クリック！");
     }
 
     /// <summary>

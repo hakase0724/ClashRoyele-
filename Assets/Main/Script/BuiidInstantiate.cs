@@ -27,13 +27,11 @@ public class BuiidInstantiate : InstantiateFiled
         if(Camera.main.GetComponent<CameraRotation>().IsRotated) pos = new Vector3(pos.x, pos.y, -pos.z);
         if (IsSameId(id, PhotonNetwork.player.ID))
         {
-            Debug.Log("自分で生成");
             Observable.TimerFrame(waitFrame)
                 .Subscribe(_ => MyInstantiate(myBuildings[num], pos, id, energy));
         }
         else
         {
-            Debug.Log("相手が生成");
             pos = new Vector3(pos.x, pos.y, -pos.z);
             MyInstantiate(myBuildings[num], pos, id, energy);
         }

@@ -17,6 +17,8 @@ public class Main : Photon.MonoBehaviour
     //エネルギーを表示するバー
     [SerializeField]
     private Slider slider;
+    [SerializeField]
+    private GameObject warningCanvas;
     private void Awake()
     {
         playerData = new PlayerData();
@@ -24,6 +26,15 @@ public class Main : Photon.MonoBehaviour
 
     private void Start()
     {
+        const int playMemberNum = 2;
+
+        this.UpdateAsObservable()
+            .Select(x => PhotonNetwork.playerList.Length)
+            .Where(x => x < playMemberNum)
+            .Do(_ => warningCanvas.SetActive(true))
+            .Where(_ => Input.anyKeyDown)
+            .Subscribe(_ => SceneLoad("Master"));
+
         playerData.playerName = PhotonNetwork.playerName;
         playerData.playerId = PhotonNetwork.player.ID;
         float energyUpRate = 0.001f;
@@ -36,22 +47,26 @@ public class Main : Photon.MonoBehaviour
             .Subscribe(x => slider.value = x / 10);
 
         enemyCount
-            .Do(x=>Debug.Log(x))
             .Buffer(2,1)
-            .Do(x => Debug.Log(x))
             .Select(x => x.Last())
-            .Do(x => Debug.Log(x))
             .Where(x => x <= 0)
-            .Do(x => Debug.Log(x))
             .Subscribe(_ => End())
             .AddTo(gameObject);
     }
 
+
     private void End()
     {
-        SceneLoad("Master");
-        PhotonNetwork.LeaveRoom();
-        PhotonNetwork.Disconnect();
+        Time.timeScale = 0;
+        this.UpdateAsObservable()
+            .Where(_ => Input.anyKeyDown)
+            .Subscribe(_ =>
+            {
+                SceneLoad("Master");
+                PhotonNetwork.LeaveRoom();
+                PhotonNetwork.Disconnect();
+            });
+       
     }
 
     /// <summary>
