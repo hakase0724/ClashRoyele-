@@ -23,6 +23,7 @@ public class Master : Photon.PunBehaviour
 
     private void Awake()
     {
+        Time.timeScale = 1;
         if (PhotonNetwork.inRoom)
         {
             inputCanvas.SetActive(false);
