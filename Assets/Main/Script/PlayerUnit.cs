@@ -21,7 +21,6 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
     private CameraRotation camera => Camera.main.GetComponent<CameraRotation>();
     private GameObject targetObject;
     private Transform nextTargetTransform;
-    private IUnit target;
     private IDisposable updateStream;
     private IDisposable intervalStream;
     //識別番号 0=自分.1=自分以外
@@ -39,10 +38,17 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
         if (targetObject == null) targetList.AddRange(stageScript.GetComponent<BulidingsManeger>().bridges);
         else if (identificationNumber == 0) targetList.AddRange(stageScript.GetComponent<BulidingsManeger>().myBulidings);
         else targetList.AddRange(stageScript.GetComponent<BulidingsManeger>().enemyBulidings);
-        //一番近い建物を探してその方向を向く
-        targetObject = CalcDistance(gameObject, targetList, camera.IsRotated);
-        target = targetObject.GetComponent(typeof(IUnit)) as IUnit;
         var t = TargetLock();
+        targetObject = CalcDistance(gameObject, t, camera.IsRotated);
+        Debug.Log(targetObject);
+        //一番近い建物を探してその方向を向く
+        //targetObject = CalcDistance(gameObject, targetList, camera.IsRotated);
+        //updateStream = this.UpdateAsObservable()
+        //    .Subscribe(_ =>
+        //    {
+        //        transform.LookAt(targetObject.transform);
+        //        rb.velocity = transform.forward;
+        //    });
         updateStream = this.UpdateAsObservable()
             .Subscribe(_ =>
             {
@@ -51,18 +57,18 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
             });
     }
 
-    private GameObject TargetLock()
+    private List<GameObject> TargetLock()
     {
         Debug.Log("TargetLock Called!");
-        const float viewAngle = 60.0f;
+        const float viewAngle = 180.0f;
         Debug.Log("向き宣言");
-        Vector3 viewVector = Vector3.forward;
-        
+        Vector3 viewVector = this.transform.forward;       
         //対象のリスト
         List<GameObject> targetList = new List<GameObject>();
         Debug.Log("リスト更新");
-        if (targetObject == null) targetList.AddRange(stageScript.GetComponent<BulidingsManeger>().bridges);
-        else if (identificationNumber == 0) targetList.AddRange(stageScript.GetComponent<BulidingsManeger>().myBulidings);
+        targetList.AddRange(stageScript.GetComponent<BulidingsManeger>().bridges);
+        //if (targetObject == null) targetList.AddRange(stageScript.GetComponent<BulidingsManeger>().bridges);
+        if (identificationNumber == 0) targetList.AddRange(stageScript.GetComponent<BulidingsManeger>().myBulidings);
         else targetList.AddRange(stageScript.GetComponent<BulidingsManeger>().enemyBulidings);
         Debug.Log("リスト制作");
         var lockOnList =
@@ -70,15 +76,8 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
              where Vector3.Angle((lockOn.transform.position - this.transform.position).normalized, viewVector) <= viewAngle
              select lockOn).ToList();
         Debug.Log("ログ表示");
-        if (lockOnList.Count <= 0)
-        {
-            Debug.Log("ロックオンしたオブジェクトの数" + lockOnList.Count);
-            return null;
-        }
-        foreach (var l in lockOnList)
-        {
-            Debug.Log("ロックオンしたオブジェクト" + l);
-        }
+        if (lockOnList.Count <= 0) return null;
+        else return lockOnList;
         return null;
              
     }
@@ -163,5 +162,11 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
         //相手と自分の生成者が同一であれば
         if (otherUnit.isMine.Value == isMine.Value) return;
         Move();
+    }
+
+    public void TriggerOn(GameObject other)
+    {
+        if (other == targetObject) Move();
+        else return;
     }
 }
