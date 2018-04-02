@@ -5,59 +5,45 @@ using System.Linq;
 using UnityEngine;
 using UniRx;
 using UniRx.Triggers;
+using UnityEngine.AI;
 
 public class TestMove : MonoBehaviour
 {
-    public bool isMine { get; set; }
-    private TestManeger maneger => GameObject.FindGameObjectWithTag("Main").GetComponent<TestManeger>();
-    private List<GameObject> targets = new List<GameObject>();
+    [SerializeField]
+    private GameObject game;
+    [SerializeField]
     private GameObject target;
-    // Use this for initialization
-    void Start ()
+
+    private GameObject targetRemenber;
+
+    private void Start()
     {
-        isMine = true;
-        targets = maneger.objects;
-        target = SearchMinDistance(CalcDistance());
-        const float unitSpeed = 10f;  
         this.UpdateAsObservable()
+            .Where(_=>target.activeInHierarchy)
             .Subscribe(_ =>
             {
                 transform.LookAt(target.transform);
-                GetComponent<Rigidbody>().velocity = transform.forward * unitSpeed;
-            })
-            .AddTo(gameObject);
+                transform.position = Vector3.MoveTowards(this.transform.position, target.transform.position, 0.05f);
+            });
+        this.UpdateAsObservable()
+            .Where(_=>target.transform.position == transform.position)
+            .Subscribe(_ =>
+            {
+                if(target.GetComponent<Point>() != null) target = target.GetComponent<Point>().next;
+            });
     }
 
-    private List<float> CalcDistance()
+    private void Update()
     {
-        List<float> distances = new List<float>();
-        float distance = 0f;
-        foreach (var t in targets)
+        if (target == null)
         {
-            distance = (this.transform.position - t.transform.position).sqrMagnitude;
-            distances.Add(distance);
+            target = targetRemenber;
         }
-        return distances;
     }
-
-    private float CalcDistance(Vector3 pos)
+    private void OnTriggerEnter(Collider other)
     {
-        return (this.transform.position - pos).sqrMagnitude;
-    }
-
-    private GameObject SearchMinDistance(List<float> distances)
-    {
-        float ignoreDistance = 2f;
-        var minIdx = distances
-            .Select((val, idx) => new { V = val, I = idx })
-            .Where((min, working) => min.V > ignoreDistance * ignoreDistance)
-            .Aggregate((min, working) => (min.V < working.V) ? min : working).I;
-        return targets[minIdx];
-    }
-
-    public void NextSet(GameObject next)
-    {
-        target = next;
-        Debug.Log(target.name);
+        if (other.GetComponent(typeof(IBuilding)) as IBuilding == null) return;
+        targetRemenber = target;
+        target = other.gameObject;
     }
 }

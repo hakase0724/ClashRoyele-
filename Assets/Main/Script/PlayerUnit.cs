@@ -13,21 +13,28 @@ using System;
 /// </summary>
 public class PlayerUnit : Photon.MonoBehaviour, IUnit
 {
+    [SerializeField]
+    private float hp;
     public BoolReactiveProperty isMine { get; set; } = new BoolReactiveProperty();
     public BoolReactiveProperty isAlive { get; set; } = new BoolReactiveProperty(true);
-    public FloatReactiveProperty UnitHp { get; set; } = new FloatReactiveProperty(10);
+    public FloatReactiveProperty UnitHp { get; set; } = new FloatReactiveProperty(100);
     public float UnitEnergy { get; set; } = 1;
     private GameObject stageScript => GameObject.FindGameObjectWithTag("Main");
     //次に狙う対象
     private GameObject nextTarget;
     private List<GameObject> targets = new List<GameObject>();
     private IDisposable updateStream;
-    private IDisposable intervalStream;
     private float unitSpeed;
     private Rigidbody rb => GetComponent<Rigidbody>();
     private Animator anim => GetComponent<Animator>();
     [SerializeField]
     private Color[] color = new Color[0];
+
+    private void Awake()
+    {
+        UnitHp.Value = hp;
+        if (Camera.main.GetComponent<CameraRotation>().IsRotated) Quaternion.EulerAngles(0, 180, 0);
+    }
 
     private void Start()
     {
@@ -47,7 +54,9 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
             .Subscribe(_ =>
             {
                 transform.LookAt(nextTarget.transform);
-                rb.velocity = transform.forward * unitSpeed;
+                transform.Rotate(new Vector3(0, transform.rotation.y, 0));
+                transform.position = Vector3.MoveTowards(this.transform.position, nextTarget.transform.position, unitSpeed);
+                //rb.velocity = transform.forward * unitSpeed;
             })
             .AddTo(gameObject);
     }
@@ -59,7 +68,9 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
             .Subscribe(_ =>
             {
                 transform.LookAt(enemy.transform);
-                rb.velocity = transform.forward * unitSpeed;
+                transform.Rotate(new Vector3(0, transform.rotation.y, 0));
+                transform.position = Vector3.MoveTowards(this.transform.position, nextTarget.transform.position, unitSpeed);
+                //rb.velocity = transform.forward * unitSpeed;
             })
             .AddTo(gameObject);
     }
@@ -119,16 +130,23 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
 
     public void Attack(float attack,GameObject attackTarget)
     {
+        Debug.Log(attackTarget);
         //攻撃間隔
         const int attackInterval = 1;
         //攻撃対象のIUnit付きコンポーネントを取得
         var attackTargetInterface = attackTarget.GetComponent(typeof(IUnit)) as IUnit;
+        if (attackTargetInterface.isMine.Value == isMine.Value)
+        {
+            Debug.Log("自分には攻撃しない");
+            return;
+        }
         //攻撃時には動きを止める
         updateStream.Dispose();
         rb.velocity = Vector3.zero;
         //攻撃間隔ごとに攻撃し相手のDamageメソッドを呼び出す
-        intervalStream = Observable.Interval(System.TimeSpan.FromSeconds(attackInterval))
-            .Subscribe(_ => attackTargetInterface.Damage(attack));
+        var intervalStream = Observable.Interval(System.TimeSpan.FromSeconds(attackInterval))
+            .Subscribe(_ => attackTargetInterface.Damage(attack))
+            .AddTo(gameObject);
         //対象の体力を監視し体力がなくなったら攻撃をやめ、移動する
         attackTargetInterface.UnitHp
             .Where(x => x <= 0)
@@ -142,6 +160,7 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
 
     public void Damage(float damage)
     {
+        Debug.Log("ダメージを受ける");
         UnitHp.Value -= damage;
     }
 
@@ -179,6 +198,7 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
     {
         var otherComponent = other.gameObject.GetComponent(typeof(IUnit)) as IUnit;
         if (otherComponent == null) return;
+        if (other.gameObject == gameObject) return;
         if (otherComponent.isMine.Value != isMine.Value) Attack(10f, other.gameObject);
         else updateStream.Dispose();
     }
@@ -187,7 +207,6 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
     {
         var otherComponent = other.gameObject.GetComponent(typeof(IUnit)) as IUnit;
         if (otherComponent == null) return;
-        Debug.Log("右へ回避");
         if (otherComponent.isMine.Value == isMine.Value) rb.velocity = transform.right;
     }
 
@@ -201,6 +220,5 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
     public void NextSet(GameObject next)
     {
         nextTarget = next;
-        Debug.Log(nextTarget.name + "," + nextTarget.transform.position);
     }
 }
