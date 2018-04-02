@@ -57,6 +57,7 @@ public class Main : Photon.MonoBehaviour
     [PunRPC]
     public void End()
     {
+        Debug.Log("終了処理開始");
         Time.timeScale = 0;
         this.UpdateAsObservable()
             .Where(_ => Input.anyKeyDown)
