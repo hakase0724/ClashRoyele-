@@ -50,11 +50,11 @@ public class Main : Photon.MonoBehaviour
             .Buffer(2,1)
             .Select(x => x.Last())
             .Where(x => x <= 0)
-            .Subscribe(_ => End())
+            .Subscribe(_ => photonView.RPC("End", PhotonTargets.All))
             .AddTo(gameObject);
     }
 
-
+    [PunRPC]
     public void End()
     {
         Time.timeScale = 0;
