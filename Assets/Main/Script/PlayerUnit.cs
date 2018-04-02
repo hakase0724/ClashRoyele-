@@ -34,7 +34,10 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
         targets = stageScript.GetComponent<BulidingsManeger>().wayPoints;
         anim.enabled = true;
         nextTarget = SearchMinDistance(CalcDistance());
-        unitSpeed = 5f;
+        unitSpeed = 1f;
+        UnitHp
+            .Where(x => x <= 0)
+            .Subscribe(x => Death());
     }
 
     public void Move()
@@ -44,6 +47,18 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
             .Subscribe(_ =>
             {
                 transform.LookAt(nextTarget.transform);
+                rb.velocity = transform.forward * unitSpeed;
+            })
+            .AddTo(gameObject);
+    }
+
+    public void Move(GameObject enemy)
+    {
+        updateStream.Dispose();
+        updateStream = this.UpdateAsObservable()
+            .Subscribe(_ =>
+            {
+                transform.LookAt(enemy.transform);
                 rb.velocity = transform.forward * unitSpeed;
             })
             .AddTo(gameObject);
@@ -133,6 +148,7 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
     public void Death()
     {
         isAlive.Value = false;
+        Destroy(gameObject);
     }
     private void OnTriggerEnter(Collider other)
     {
@@ -142,25 +158,29 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
         if (otherUnit == null) return;
         //相手と自分の生成者が同一であれば
         if (otherUnit.isMine.Value == isMine.Value) return;
+        if (!IsLooked(other.gameObject))
+        {
+            Debug.Log("見えていない");
+            return;
+        }
         //相手の体力があれば
-        if (otherUnit.UnitHp.Value > 0) Attack(10f, other.gameObject);
+        if (otherUnit.UnitHp.Value > 0) Move(other.gameObject);
     }
 
-    private void OnTriggerExit(Collider other)
+    private bool IsLooked(GameObject other)
     {
-        //対象のIUnit付きコンポーネントを取得
-        var otherUnit = other.gameObject.GetComponent(typeof(IUnit)) as IUnit;
-        //ユニットでなければ
-        if (otherUnit == null) return;
-        //相手と自分の生成者が同一であれば
-        if (otherUnit.isMine.Value == isMine.Value) return;
-        Move();
+        float angle = 90f;
+        if (Vector3.Angle(other.transform.position - this.transform.position, transform.forward) <= angle) return true;
+        else return false;
     }
+
+
     private void OnCollisionEnter(Collision other)
     {
         var otherComponent = other.gameObject.GetComponent(typeof(IUnit)) as IUnit;
         if (otherComponent == null) return;
-        updateStream.Dispose();
+        if (otherComponent.isMine.Value != isMine.Value) Attack(10f, other.gameObject);
+        else updateStream.Dispose();
     }
 
     private  void OnCollisionStay(Collision other)

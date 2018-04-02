@@ -44,4 +44,5 @@ MonoBehaviour:
   - TaggedPlayer
   - RPCTest
   - MyInstantiateRPC
+  - End
   DisableAutoOpenWizard: 1
