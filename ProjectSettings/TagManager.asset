@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Main
   - Bridge
+  - Enemy
   layers:
   - Default
   - TransparentFX

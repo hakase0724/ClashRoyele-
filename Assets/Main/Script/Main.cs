@@ -55,7 +55,7 @@ public class Main : Photon.MonoBehaviour
     }
 
 
-    private void End()
+    public void End()
     {
         Time.timeScale = 0;
         this.UpdateAsObservable()

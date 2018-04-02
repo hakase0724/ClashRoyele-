@@ -20,7 +20,7 @@ public class Bridge : MonoBehaviour, IBuilding
 
     public void EnterTransform()
     {
-        maneger.EnterList(this.gameObject, this);
+        
     }
 
     public void ReleaseTransform()

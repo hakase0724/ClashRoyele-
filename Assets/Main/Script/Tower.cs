@@ -11,10 +11,8 @@ public class Tower : MonoBehaviour, IBuilding, IUnit
     public BoolReactiveProperty isAlive { get; set; } = new BoolReactiveProperty(true);
     public float UnitEnergy { get; set; } = 0;
     public FloatReactiveProperty UnitHp { get; set; } = new FloatReactiveProperty(10);
-    private Main main => GameObject.FindGameObjectWithTag("Main").GetComponent<Main>();
+    protected Main main => GameObject.FindGameObjectWithTag("Main").GetComponent<Main>();
     private BulidingsManeger maneger => GameObject.FindGameObjectWithTag("Main").GetComponent<BulidingsManeger>();
-    //識別番号 0=自分.1=自分以外
-    private int identificationNumber = 0;
     [SerializeField]
     private Color[] color = new Color[0];
 
@@ -47,7 +45,7 @@ public class Tower : MonoBehaviour, IBuilding, IUnit
 
     public void EnterTransform()
     {
-        maneger.EnterList(this.gameObject, this, identificationNumber);
+        //maneger.EnterList(this.gameObject, this, isMine.Value);
     }
 
     public void Move()
@@ -70,14 +68,17 @@ public class Tower : MonoBehaviour, IBuilding, IUnit
             colorNumber = 1;
             isMine.Value = false;
         }
-        //判別結果に応じて識別番号を更新
-        identificationNumber = colorNumber;
         renderer.material.color = color[colorNumber];
     }
 
-    public void ReleaseTransform()
+    public virtual void ReleaseTransform()
     {
-        maneger.ReleaseList(this.gameObject);
+        //maneger.ReleaseList(this.gameObject);
         if (!isMine.Value) main.EnemyCount(-1);
+    }
+
+    public void NextSet(GameObject next)
+    {
+        throw new NotImplementedException();
     }
 }

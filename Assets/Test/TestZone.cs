@@ -8,7 +8,6 @@ public class TestZone : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
-        Debug.Log(transform.root.gameObject);
         
         
 	}
@@ -20,8 +19,7 @@ public class TestZone : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        Debug.Log(other.gameObject);
-        var parentUnit = transform.root.gameObject.GetComponent<PlayerUnit>();
-        parentUnit.TriggerOn();
+        var parentUnit = transform.root.gameObject.GetComponent<NavTest>();
+        parentUnit.TriggerOn(other.gameObject);
     }
 }

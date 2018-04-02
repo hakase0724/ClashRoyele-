@@ -6,6 +6,6 @@ public class HitNotice : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        transform.root.gameObject.GetComponent<PlayerUnit>().TriggerOn(other.gameObject);
+        //transform.root.gameObject.GetComponent<PlayerUnit>().TriggerOn(other.gameObject);
     }
 }

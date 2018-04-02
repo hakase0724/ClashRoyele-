@@ -34,4 +34,5 @@ public interface IUnit
     /// <param name="damage">受けるダメージ</param>
     void Damage(float damage);
     void Death();
+    void NextSet(GameObject next);
 }
