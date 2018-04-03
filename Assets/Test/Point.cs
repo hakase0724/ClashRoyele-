@@ -16,7 +16,9 @@ public class Point : MonoBehaviour
     }
     private void Start()
     {
-        if (Camera.main.GetComponent<CameraRotation>().IsRotated) transform.position = new Vector3(transform.position.x, transform.position.y, -transform.position.z);
+        //if (Camera.main.GetComponent<CameraRotation>().IsRotated) transform.position = new Vector3(transform.position.x, transform.position.y, -transform.position.z);
+        //GameObject.FindGameObjectWithTag("Main").GetComponent<BulidingsManeger>().InsertRoot(rootStetas);
+
         GameObject.FindGameObjectWithTag("Main").GetComponent<BulidingsManeger>().InsertRoot(rootStetas);
     }
 }

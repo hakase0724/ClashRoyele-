@@ -66,9 +66,9 @@ public class BulidingsManeger : MonoBehaviour
                 RightRoot.Sort((x, y) => x.number - y.number);
                 break;
         }
-        LeftEnemyRoot = LeftRoot;
-        LeftEnemyRoot.Reverse();
-        RightEnemyRoot = RightRoot;
-        RightEnemyRoot.Reverse();
+        //LeftEnemyRoot = LeftRoot;
+        //LeftEnemyRoot.Reverse();
+        //RightEnemyRoot = RightRoot;
+        //RightEnemyRoot.Reverse();
     }
 }

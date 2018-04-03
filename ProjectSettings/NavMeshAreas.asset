@@ -15,8 +15,8 @@ NavMeshProjectSettings:
     cost: 1
   - name: sub
     cost: 10
-  - name: 
-    cost: 1
+  - name: not
+    cost: 10000000
   - name: 
     cost: 1
   - name: 
