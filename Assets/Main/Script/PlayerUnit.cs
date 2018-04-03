@@ -13,95 +13,127 @@ using System;
 /// </summary>
 public class PlayerUnit : Photon.MonoBehaviour, IUnit
 {
-    [SerializeField]
-    private float hp;
+    public enum Stetas
+    {
+        Normal,//通常
+        Attack //攻撃
+    }   
     public BoolReactiveProperty isMine { get; set; } = new BoolReactiveProperty();
     public BoolReactiveProperty isAlive { get; set; } = new BoolReactiveProperty(true);
     public FloatReactiveProperty UnitHp { get; set; } = new FloatReactiveProperty(100);
     public float UnitEnergy { get; set; } = 1;
+    //自身の状態
+    private Stetas stetas;
+    //自分が左右どちらにいるか
+    private RootStetas.LRStetas myStetas;
+    //自分の進行ルート
+    private List<RootStetas> myRoot = new List<RootStetas>();
+    private Queue<GameObject> targetEnemy = new Queue<GameObject>();
+    private GameObject targetRemenber;
+    private IntReactiveProperty currentRoot = new IntReactiveProperty(0);
     private GameObject stageScript => GameObject.FindGameObjectWithTag("Main");
     //次に狙う対象
-    private GameObject nextTarget;
+    private GameObject target;
     private List<GameObject> targets = new List<GameObject>();
-    private IDisposable updateStream;
+    private List<IDisposable> updateStreams = new List<IDisposable>();
+    //ユニットの移動速度
     private float unitSpeed;
     private Rigidbody rb => GetComponent<Rigidbody>();
     private Animator anim => GetComponent<Animator>();
-    [SerializeField]
+
+    [SerializeField,Tooltip("自分と相手のときそれぞれの色")]
     private Color[] color = new Color[0];
+    [SerializeField,Tooltip("ユニットの体力")]
+    private float hp = 100;
 
     private void Awake()
     {
         UnitHp.Value = hp;
-        if (Camera.main.GetComponent<CameraRotation>().IsRotated) Quaternion.EulerAngles(0, 180, 0);
+        targetRemenber = null;
+        anim.enabled = true;
+        stetas = Stetas.Normal;      
     }
 
     private void Start()
     {
-        targets = stageScript.GetComponent<BulidingsManeger>().wayPoints;
-        anim.enabled = true;
-        nextTarget = SearchMinDistance(CalcDistance());
-        unitSpeed = 1f;
+        if (transform.position.x <= 0) myStetas = RootStetas.LRStetas.Left;
+        else myStetas = RootStetas.LRStetas.Right;
+        //自分の左右ステータスによってルートを決める
+        switch (myStetas)
+        {
+            case RootStetas.LRStetas.Left:
+                myRoot = stageScript.GetComponent<BulidingsManeger>().LeftRoot;
+                break;
+            case RootStetas.LRStetas.Right:
+                myRoot = stageScript.GetComponent<BulidingsManeger>().RightRoot;
+                break;
+        }
+
         UnitHp
-            .Where(x => x <= 0)
-            .Subscribe(x => Death());
+           .Where(x => x <= 0)
+           .Subscribe(x => Death());
+
+        currentRoot
+            .Where(x => x < myRoot.Count)
+            .Subscribe(x => target = myRoot[x].rootObject);
+    }
+    /// <summary>
+    /// ターゲットをロックオンしなおす
+    /// </summary>
+    private void TargetLockOn()
+    {
+        if (targetEnemy.Count >= 1)
+        {
+            target = targetEnemy.Dequeue();
+        }
+        else if (targetEnemy.Count <= 0)
+        {
+            //以前まで狙っていたターゲットがいた場合そのターゲットをロックオンする
+            if (targetRemenber == null) targetRemenber = myRoot[currentRoot.Value].rootObject;
+            target = targetRemenber;
+            targetRemenber = null;
+            stetas = Stetas.Normal;
+        }
     }
 
     public void Move()
-    {     
-        updateStream = this.UpdateAsObservable()
-            .Where(_=>nextTarget != null)
-            .Subscribe(_ =>
-            {
-                transform.LookAt(nextTarget.transform);
-                transform.Rotate(new Vector3(0, transform.rotation.y, 0));
-                transform.position = Vector3.MoveTowards(this.transform.position, nextTarget.transform.position, unitSpeed);
-                //rb.velocity = transform.forward * unitSpeed;
-            })
-            .AddTo(gameObject);
-    }
+    {       
+        //到達したと判断する距離
+        var reachDistance = 0.5f;
+        unitSpeed = 0.05f;
+        updateStreams.Add
+            (
+            //ターゲットがいて、生きていればターゲットへ向かう
+            this.UpdateAsObservable()
+                .Where(_ => target != null)
+                .Where(_ => target.activeInHierarchy)
+                .Subscribe(_ =>
+                {
+                    transform.LookAt(target.transform);
+                    transform.position = Vector3.MoveTowards(this.transform.position, target.transform.position, unitSpeed);
+                }, ex => Debug.Log(ex + ",向いて移動"))
+            );
 
-    public void Move(GameObject enemy)
-    {
-        updateStream.Dispose();
-        updateStream = this.UpdateAsObservable()
-            .Subscribe(_ =>
-            {
-                transform.LookAt(enemy.transform);
-                transform.Rotate(new Vector3(0, transform.rotation.y, 0));
-                transform.position = Vector3.MoveTowards(this.transform.position, nextTarget.transform.position, unitSpeed);
-                //rb.velocity = transform.forward * unitSpeed;
-            })
-            .AddTo(gameObject);
-    }
-    #region 
-    private List<float> CalcDistance()
-    {
-        List<float> distances = new List<float>();
-        float distance = 0f;
-        foreach (var t in targets)
-        {
-            distance = (this.transform.position - t.transform.position).sqrMagnitude;
-            distances.Add(distance);
-        }
-        return distances;
-    }
+        updateStreams.Add
+            (
+            //ターゲットに到達したとき次のターゲットへ移行する
+            this.UpdateAsObservable()
+                .Where(_ => target != null)
+                .Where(_ => CalcDistance(transform.position,target.transform.position) <= reachDistance)
+                .Subscribe(_ =>
+                {
+                    currentRoot.Value += 1;
+                }, ex => Debug.Log(ex + ",次のやつ更新"))
+            );
 
-    private float CalcDistance(Vector3 pos)
-    {
-        return (this.transform.position - pos).sqrMagnitude;
+        updateStreams.Add
+            (
+            //ターゲットがいなくなった時ターゲットをロックオンしなおす
+             this.UpdateAsObservable()
+                .Where(_ => target == null)
+                .Subscribe(_ => TargetLockOn())
+            ); 
     }
-
-    private GameObject SearchMinDistance(List<float> distances)
-    {
-        float ignoreDistance = 2f;
-        var minIdx = distances
-            .Select((val, idx) => new { V = val, I = idx })
-            .Where((min, working) => min.V > ignoreDistance * ignoreDistance)
-            .Aggregate((min, working) => (min.V < working.V) ? min : working).I;
-        return targets[minIdx];
-    }
-    #endregion
     public void MyColor(int id)
     {
         Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
@@ -128,20 +160,15 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
             .Subscribe(_ => Move());
     }
 
-    public void Attack(float attack,GameObject attackTarget)
+    public void Attack(float attack, GameObject attackTarget)
     {
-        Debug.Log(attackTarget);
         //攻撃間隔
         const int attackInterval = 1;
         //攻撃対象のIUnit付きコンポーネントを取得
         var attackTargetInterface = attackTarget.GetComponent(typeof(IUnit)) as IUnit;
-        if (attackTargetInterface.isMine.Value == isMine.Value)
-        {
-            Debug.Log("自分には攻撃しない");
-            return;
-        }
+        if (attackTargetInterface.isMine.Value == isMine.Value) return;
         //攻撃時には動きを止める
-        updateStream.Dispose();
+        AllDispose(updateStreams);
         rb.velocity = Vector3.zero;
         //攻撃間隔ごとに攻撃し相手のDamageメソッドを呼び出す
         var intervalStream = Observable.Interval(System.TimeSpan.FromSeconds(attackInterval))
@@ -153,6 +180,7 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
             .Subscribe(_ =>
             {
                 intervalStream.Dispose();
+                TargetLockOn();
                 Move();
             })
             .AddTo(gameObject);
@@ -160,7 +188,6 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
 
     public void Damage(float damage)
     {
-        Debug.Log("ダメージを受ける");
         UnitHp.Value -= damage;
     }
 
@@ -169,23 +196,26 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
         isAlive.Value = false;
         Destroy(gameObject);
     }
+
     private void OnTriggerEnter(Collider other)
     {
-        //対象のIUnit付きコンポーネントを取得
         var otherUnit = other.gameObject.GetComponent(typeof(IUnit)) as IUnit;
-        //ユニットでなければ
         if (otherUnit == null) return;
-        //相手と自分の生成者が同一であれば
         if (otherUnit.isMine.Value == isMine.Value) return;
-        if (!IsLooked(other.gameObject))
-        {
-            Debug.Log("見えていない");
-            return;
-        }
-        //相手の体力があれば
-        if (otherUnit.UnitHp.Value > 0) Move(other.gameObject);
-    }
+        if (targetRemenber == null) targetRemenber = target;
+        if (!IsLooked(other.gameObject)) return;
 
+        switch (stetas)
+        {
+            case Stetas.Normal:
+                target = other.gameObject;
+                stetas = Stetas.Attack;
+                break;
+            case Stetas.Attack:
+                targetEnemy.Enqueue(other.gameObject);
+                break;
+        }
+    }
     private bool IsLooked(GameObject other)
     {
         float angle = 90f;
@@ -198,16 +228,26 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
     {
         var otherComponent = other.gameObject.GetComponent(typeof(IUnit)) as IUnit;
         if (otherComponent == null) return;
-        if (other.gameObject == gameObject) return;
         if (otherComponent.isMine.Value != isMine.Value) Attack(10f, other.gameObject);
-        else updateStream.Dispose();
+        else AllDispose(updateStreams);
     }
 
-    private  void OnCollisionStay(Collision other)
+    private void OnCollisionStay(Collision other)
     {
         var otherComponent = other.gameObject.GetComponent(typeof(IUnit)) as IUnit;
         if (otherComponent == null) return;
-        if (otherComponent.isMine.Value == isMine.Value) rb.velocity = transform.right;
+        if (otherComponent.isMine.Value == isMine.Value)
+        {
+            switch (myStetas)
+            {
+                case RootStetas.LRStetas.Left:
+                    rb.velocity = transform.right;
+                    break;
+                case RootStetas.LRStetas.Right:
+                    rb.velocity = -transform.right;
+                    break;
+            }
+        }      
     }
 
     private void OnCollisionExit(Collision other)
@@ -215,10 +255,5 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
         var otherComponent = other.gameObject.GetComponent(typeof(IUnit)) as IUnit;
         if (otherComponent == null) return;
         if (otherComponent.isMine.Value == isMine.Value) Move();
-    }
-
-    public void NextSet(GameObject next)
-    {
-        nextTarget = next;
     }
 }

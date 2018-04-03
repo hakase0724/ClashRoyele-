@@ -94,4 +94,17 @@ public static class StaticUse
             .Aggregate((min, working) => (min.V < working.V) ? min : working).I;
         return targetList[minIdx];
     }
+
+    public static void AllDispose(List<IDisposable> disposeList)
+    {
+        foreach(var d in disposeList)
+        {
+            d.Dispose();
+        }
+    }
+
+    public static float CalcDistance(Vector3 myPos, Vector3 targetPos)
+    {
+        return (myPos - targetPos).sqrMagnitude;
+    }
 }

@@ -3,20 +3,42 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 using UniRx.Triggers;
+using System.Linq;
 
 public class TestManeger:MonoBehaviour
 {
     public List<GameObject> objects { get; private set; } = new List<GameObject>();
 
+    public List<RootStetas> LeftRoot { get; private set; } = new List<RootStetas>();
+    public List<RootStetas> RightRoot { get; private set; } = new List<RootStetas>();
+
     private void Start()
     {
+        
         this.UpdateAsObservable()
-            .Where(_ => Input.GetKeyDown(KeyCode.C))
+            .Where(_ => Input.GetKeyDown(KeyCode.L))
             .Subscribe(_ =>
             {
-                foreach(var o in objects)
+                //for(int i = 0;i < LeftRoot.Count; i++)
+                //{
+                //    Debug.Log("左ルート" + i + "番目は" + LeftRoot[i].number + "番目の" + LeftRoot[i].rootObject + "です");
+                //}
+                foreach (var o in LeftRoot)
                 {
-                    Debug.Log(o);
+                    Debug.Log("左ルート" + o.number + "番目" + o.rootObject);
+                }
+            });
+        this.UpdateAsObservable()
+            .Where(_ => Input.GetKeyDown(KeyCode.R))
+            .Subscribe(_ =>
+            {
+                //for (int i = 0; i < RightRoot.Count; i++)
+                //{
+                //    Debug.Log("右ルート" + i + "番目は" + RightRoot[i].number + "番目の" + RightRoot[i].rootObject + "です");
+                //}
+                foreach (var o in RightRoot)
+                {
+                    Debug.Log("右ルート" + o.number + "番目" + o.rootObject);
                 }
             });
     }
@@ -24,5 +46,21 @@ public class TestManeger:MonoBehaviour
     public void Enter(GameObject enter)
     {
         objects.Add(enter);
+    }
+
+    public void InsertRoot(RootStetas rootStetas)
+    {
+        //Debug.Log("挿入場所" + rootStetas.number);
+        switch (rootStetas.stetas)
+        {
+            case RootStetas.LRStetas.Left:
+                LeftRoot.Add(rootStetas);
+                LeftRoot.Sort((x, y) => x.number - y.number);
+                break;
+            case RootStetas.LRStetas.Right:
+                RightRoot.Add(rootStetas);
+                RightRoot.Sort((x, y) => x.number - y.number);
+                break;
+        }
     }
 }

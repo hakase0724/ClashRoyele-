@@ -19,7 +19,7 @@ public class TestPoint : MonoBehaviour
     {
         Debug.Log("巡回点エリア：" + gameObject.name + "," + transform.position + "到着");
         var unit = other.gameObject.GetComponent(typeof(IUnit)) as IUnit;
-        if (unit.isMine.Value) unit.NextSet(next);
-        else unit.NextSet(prev);
+        //if (unit.isMine.Value) unit.NextSet(next);
+        //else unit.NextSet(prev);
     }
 }
