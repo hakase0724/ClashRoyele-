@@ -14,6 +14,8 @@ public class BulidingsManeger : MonoBehaviour
     public List<GameObject> wayPoints { get; private set; } = new List<GameObject>();
     public List<RootStetas> LeftRoot { get; private set; } = new List<RootStetas>();
     public List<RootStetas> RightRoot { get; private set; } = new List<RootStetas>();
+    public List<RootStetas> LeftEnemyRoot { get; private set; } = new List<RootStetas>();
+    public List<RootStetas> RightEnemyRoot { get; private set; } = new List<RootStetas>();
 
     private void Start()
     {
@@ -64,5 +66,9 @@ public class BulidingsManeger : MonoBehaviour
                 RightRoot.Sort((x, y) => x.number - y.number);
                 break;
         }
+        LeftEnemyRoot = LeftRoot;
+        LeftEnemyRoot.Reverse();
+        RightEnemyRoot = RightRoot;
+        RightEnemyRoot.Reverse();
     }
 }

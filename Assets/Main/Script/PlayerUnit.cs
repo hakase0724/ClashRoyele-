@@ -30,7 +30,7 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
     private List<RootStetas> myRoot = new List<RootStetas>();
     private Queue<GameObject> targetEnemy = new Queue<GameObject>();
     private GameObject targetRemenber;
-    private IntReactiveProperty currentRoot = new IntReactiveProperty(0);
+    private IntReactiveProperty currentRoot = new IntReactiveProperty(1);
     private GameObject stageScript => GameObject.FindGameObjectWithTag("Main");
     //次に狙う対象
     private GameObject target;
@@ -58,17 +58,32 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
     {
         if (transform.position.x <= 0) myStetas = RootStetas.LRStetas.Left;
         else myStetas = RootStetas.LRStetas.Right;
-        //自分の左右ステータスによってルートを決める
-        switch (myStetas)
+        //自分のステータスによってルートを決める
+        if (isMine.Value)
         {
-            case RootStetas.LRStetas.Left:
-                myRoot = stageScript.GetComponent<BulidingsManeger>().LeftRoot;
-                break;
-            case RootStetas.LRStetas.Right:
-                myRoot = stageScript.GetComponent<BulidingsManeger>().RightRoot;
-                break;
+            switch (myStetas)
+            {
+                case RootStetas.LRStetas.Left:
+                    myRoot = stageScript.GetComponent<BulidingsManeger>().LeftRoot;
+                    break;
+                case RootStetas.LRStetas.Right:
+                    myRoot = stageScript.GetComponent<BulidingsManeger>().RightRoot;
+                    break;
+            }
         }
-        if (!isMine.Value) myRoot.Reverse();
+
+        if (!isMine.Value)
+        {
+            switch (myStetas)
+            {
+                case RootStetas.LRStetas.Left:
+                    myRoot = stageScript.GetComponent<BulidingsManeger>().LeftEnemyRoot;
+                    break;
+                case RootStetas.LRStetas.Right:
+                    myRoot = stageScript.GetComponent<BulidingsManeger>().RightEnemyRoot;
+                    break;
+            }
+        }
 
         UnitHp
            .Where(x => x <= 0)
@@ -156,7 +171,7 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
             renderer.material.color = color[colorNumber];
         }
         //動き出しを指定時間遅らせる
-        const int waitTime = 1;
+        const int waitTime = 2;
         Observable.Timer(System.TimeSpan.FromSeconds(waitTime))
             .Subscribe(_ => Move());
     }
