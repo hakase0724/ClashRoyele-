@@ -68,6 +68,7 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
                 myRoot = stageScript.GetComponent<BulidingsManeger>().RightRoot;
                 break;
         }
+        if (!isMine.Value) myRoot.Reverse();
 
         UnitHp
            .Where(x => x <= 0)

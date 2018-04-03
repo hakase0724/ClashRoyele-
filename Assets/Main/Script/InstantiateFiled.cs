@@ -56,7 +56,7 @@ public class InstantiateFiled : Photon.PunBehaviour
         Debug.Log(!instantiateZone.GetComponent<InstantiateCheck>().IsInstantiateCheck(pos, id) + "確認結果");
         if(!instantiateZone.GetComponent<InstantiateCheck>().IsInstantiateCheck(pos,id)) yield break;
         //生成待機時間
-        const int waitFrame = 10;
+        const int waitFrame = 20;
         //生成者が自分ならwaitFrame分待機
         //相手なら即時生成
         if (IsSameId(id, PhotonNetwork.player.ID))
