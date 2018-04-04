@@ -13,7 +13,7 @@ public class Tower : MonoBehaviour, IBuilding, IUnit
     public FloatReactiveProperty unitHp { get; set; } = new FloatReactiveProperty(10);
     protected Main main => GameObject.FindGameObjectWithTag("Main").GetComponent<Main>();
     private BulidingsManeger maneger => GameObject.FindGameObjectWithTag("Main").GetComponent<BulidingsManeger>();
-
+    public float maxUnitHp { get; }
     public float unitSpeed
     {
         get

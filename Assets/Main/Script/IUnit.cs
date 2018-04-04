@@ -14,6 +14,7 @@ public interface IUnit
     float unitSpeed { get; set; }
     //ユニット生成時のコスト
     float unitEnergy { get; set; }
+    float maxUnitHp { get; }
     /// <summary>
     /// 自機の色を変える
     /// </summary>

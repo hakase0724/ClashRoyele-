@@ -6,6 +6,7 @@ using UnityEngine;
 using UniRx;
 using UniRx.Triggers;
 using UnityEngine.AI;
+using UnityEngine.UI;
 using static StaticUse;
 
 public class TestMove : MonoBehaviour,IUnit
@@ -14,77 +15,121 @@ public class TestMove : MonoBehaviour,IUnit
     public FloatReactiveProperty unitHp { get; set; } = new FloatReactiveProperty();
     public float unitEnergy { get; set; }
     public float unitSpeed { get; set; }
+    public float maxUnitHp { get {return _UnitHp; } }
 
     private int targetPointa = 0;
+    private TargetGet targetGet => Camera.main.GetComponent<TargetGet>();
     private NavMeshAgent nav => GetComponent<NavMeshAgent>();
     private Animator anim => GetComponent<Animator>();
     private Rigidbody rb => GetComponent<Rigidbody>();
-    private IDisposable updateStream;
-    private IDisposable attackStream;
-    private Subject<Unit> stopStream = new Subject<Unit>();
-    [SerializeField]
-    private GameObject[] targets = new GameObject[0];
-    [SerializeField]
-    private GameObject left;
-    [SerializeField]
-    private GameObject right;
+    private Queue<GameObject> targetQueue = new Queue<GameObject>();
+    private List<Vector3> targets = new List<Vector3>();
+    
     [SerializeField]
     private bool _IsMine;
     [SerializeField]
     private float _UnitHp;
-
-    private void Awake()
-    {
-        
-    }
+    [SerializeField, Tooltip("自分と相手のときそれぞれの色")]
+    private Color[] color = new Color[0];
     private  void Start()
     {
         isMine.Value = _IsMine;
         unitHp.Value = _UnitHp;
-        unitSpeed = 3f;
-        nav.autoBraking = false;
+        if (isMine.Value)
+        {
+            Debug.Log("mine取得");
+            targets.AddRange(targetGet.mine);
+        }
+        else
+        {
+            Debug.Log("enemy取得");
+            targets.AddRange(targetGet.enemys);
+        }
         LeftOrRight();
-        Move();
+
+        
+        unitSpeed = 3f;
+        //目的地に近づいたときに減速しないようにする
+        nav.autoBraking = false;
+
         this.UpdateAsObservable()
+            .Where(_ => Input.GetKeyDown(KeyCode.T))
+            .Subscribe(_ =>
+            {
+                foreach (var m in targets)
+                {
+                    Debug.Log(m);
+                }
+            });
+
+        //動き出しを指定時間遅らせる
+        const int waitTime = 2;
+        var startTimer = Observable.Timer(TimeSpan.FromSeconds(waitTime));
+
+        this.UpdateAsObservable()
+            .SkipUntil(startTimer)
             .Where(_ => !nav.pathPending)
             .Where(_ => nav.remainingDistance < 0.5f)
             .Subscribe(_ => Move())
             .AddTo(gameObject);
-    }
 
+        unitHp
+            .Where(x => x <= 0)
+            .Subscribe(x => Death())
+            .AddTo(gameObject);
+    }
     private void LeftOrRight()
     {
-        if (CalcDistance(transform.position, left.transform.position) <= CalcDistance(transform.position, right.transform.position))
-        {
-            targets[0] = left;
-        }
-        else
-        {
-            targets[0] = right;
-        }
+        float left = CalcDistance(transform.position, targets[0]);
+        float right = CalcDistance(transform.position, targets[2]);
+        if (left > right) targets.Reverse();
     }
+    
 
     public void Move()
     {
-        if (targets.Length <= 0) return;
-        if (targetPointa >= targets.Length) return;
-        if (targets[targetPointa] == null) return;
-        nav.destination = targets[targetPointa].transform.position;
+        if (targets.Count <= 0) return;
+        if (targetPointa >= targets.Count) return;
+        if (targets[targetPointa] == null)
+        {
+            nav.Stop();
+            anim.SetBool("Attack", true);
+            return;
+        }
+        if (!anim.enabled) anim.enabled = true;
+        nav.destination = targets[targetPointa];
         targetPointa++;
     }
 
     public void MyColor(int id)
     {
-        
+        Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+        int colorNumber;
+        //生成者が自分か相手か判別
+        if (IsSameId(id, PhotonNetwork.player.ID))
+        {
+            colorNumber = 0;
+            isMine.Value = true;
+        }
+        else
+        {
+            colorNumber = 1;
+            isMine.Value = false;
+        }
+        //判別結果に応じて識別番号を更新
+        foreach (Renderer renderer in renderers)
+        {
+            renderer.material.color = color[colorNumber];
+        }       
     }
 
     public void Attack(float attack, GameObject attackTarget)
     {
         const int attackInterval = 1;
         var a = attackTarget.GetComponent(typeof(IUnit)) as IUnit;
-        attackStream = Observable.Interval(TimeSpan.FromSeconds(attackInterval))
+        Observable.Interval(TimeSpan.FromSeconds(attackInterval))
             .TakeUntilDestroy(attackTarget)
-            .Subscribe(_ => Attack(attack,a),() => Comp(attackStream))
+            .Subscribe(_ => Attack(attack,a),() => Comp())
             .AddTo(gameObject);
     }
 
@@ -95,15 +140,25 @@ public class TestMove : MonoBehaviour,IUnit
         nav.speed = 0f;
     }
 
-    private void Comp(IDisposable stream)
+    private void Comp()
     {
-        nav.destination = targets[targetPointa].transform.position;
-        anim.SetBool("Attack", false);
-        nav.speed = unitSpeed;
+        targetQueue.Dequeue();
+        if (targetQueue.Count >= 1) GoToTarget(targetQueue.Peek());
+        else
+        {
+            if (nav.pathStatus != NavMeshPathStatus.PathInvalid)
+            {
+                nav.destination = targets[targetPointa];
+            }
+            anim.SetBool("Attack", false);
+            nav.speed = unitSpeed;
+        }
+       
     }
 
     public void Damage(float damage)
     {
+        Debug.Log("ダメージを受ける" + gameObject);
         unitHp.Value -= damage;
     }
 
@@ -115,15 +170,26 @@ public class TestMove : MonoBehaviour,IUnit
     private void TargetLockOn(GameObject target)
     {
         float targetDistance = 5f;
-        const float angle = 30f;
         if (CalcDistance(transform.position, target.transform.position) > targetDistance * targetDistance) return;
-        //if (!IsLooked(target.transform.position, transform.position, transform.forward, angle)) return;       
-        GoToTarget(target);
+        if (targetQueue.Count <= 0)
+        {
+            Debug.Log("攻撃を仕掛ける" + target.name);
+            GoToTarget(target);
+            targetQueue.Enqueue(target);
+        }
+        else
+        {
+            Debug.Log("攻撃を待機" + target.name);
+            targetQueue.Enqueue(target);
+        }
     }
 
     private void GoToTarget(GameObject target)
     {
-        nav.destination = target.transform.position;
+        if (nav.pathStatus != NavMeshPathStatus.PathInvalid)
+        {
+            nav.destination = target.transform.position;
+        }       
         Attack(10f, target);
     }
 
@@ -131,8 +197,9 @@ public class TestMove : MonoBehaviour,IUnit
     {
         var otherUnit = other.GetComponent(typeof(IUnit)) as IUnit;
         if (otherUnit == null) return;
-        //if (otherUnit.isMine.Value == isMine.Value) return;
+        if (otherUnit.isMine.Value == isMine.Value) return;
         TargetLockOn(other.gameObject);
+        nav.speed = 0f;
     }
 }
 

@@ -54,6 +54,14 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
         }
     }
 
+    public float maxUnitHp
+    {
+        get
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     [SerializeField,Tooltip("自分と相手のときそれぞれの色")]
     private Color[] color = new Color[0];
     [SerializeField,Tooltip("ユニットの体力")]
