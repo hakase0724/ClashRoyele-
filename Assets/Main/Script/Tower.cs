@@ -9,10 +9,24 @@ public class Tower : MonoBehaviour, IBuilding, IUnit
 {
     public BoolReactiveProperty isMine { get; set; } = new BoolReactiveProperty();
     public BoolReactiveProperty isAlive { get; set; } = new BoolReactiveProperty(true);
-    public float UnitEnergy { get; set; } = 0;
-    public FloatReactiveProperty UnitHp { get; set; } = new FloatReactiveProperty(10);
+    public float unitEnergy { get; set; } = 0;
+    public FloatReactiveProperty unitHp { get; set; } = new FloatReactiveProperty(10);
     protected Main main => GameObject.FindGameObjectWithTag("Main").GetComponent<Main>();
     private BulidingsManeger maneger => GameObject.FindGameObjectWithTag("Main").GetComponent<BulidingsManeger>();
+
+    public float unitSpeed
+    {
+        get
+        {
+            throw new NotImplementedException();
+        }
+
+        set
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     [SerializeField]
     private Color[] color = new Color[0];
 
@@ -20,7 +34,7 @@ public class Tower : MonoBehaviour, IBuilding, IUnit
     {
         if (!isMine.Value) main.EnemyCount(1);
         EnterTransform();
-        UnitHp
+        unitHp
             .Where(x => x <= 0)
             .Subscribe(_ => Death())
             .AddTo(gameObject);
@@ -33,7 +47,7 @@ public class Tower : MonoBehaviour, IBuilding, IUnit
 
     public void Damage(float damage)
     {
-        UnitHp.Value -= damage;
+        unitHp.Value -= damage;
     }
 
     public void Death()

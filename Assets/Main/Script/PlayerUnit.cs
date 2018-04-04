@@ -18,10 +18,10 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
         Normal,//通常
         Attack //攻撃
     }   
-    public BoolReactiveProperty isMine { get; set; } = new BoolReactiveProperty();
+    public BoolReactiveProperty isMine { get; set; } = new BoolReactiveProperty(true);
     public BoolReactiveProperty isAlive { get; set; } = new BoolReactiveProperty(true);
-    public FloatReactiveProperty UnitHp { get; set; } = new FloatReactiveProperty(100);
-    public float UnitEnergy { get; set; } = 1;
+    public FloatReactiveProperty unitHp { get; set; } = new FloatReactiveProperty(100);
+    public float unitEnergy { get; set; } = 1;
     //自身の状態
     private Stetas stetas;
     //自分が左右どちらにいるか
@@ -41,6 +41,19 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
     private Rigidbody rb => GetComponent<Rigidbody>();
     private Animator anim => GetComponent<Animator>();
 
+    float IUnit.unitSpeed
+    {
+        get
+        {
+            throw new NotImplementedException();
+        }
+
+        set
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     [SerializeField,Tooltip("自分と相手のときそれぞれの色")]
     private Color[] color = new Color[0];
     [SerializeField,Tooltip("ユニットの体力")]
@@ -48,7 +61,7 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
 
     private void Awake()
     {
-        UnitHp.Value = hp;
+        unitHp.Value = hp;
         targetRemenber = null;
         anim.enabled = true;
         stetas = Stetas.Normal;      
@@ -85,7 +98,7 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
             }
         }
 
-        UnitHp
+        unitHp
            .Where(x => x <= 0)
            .Subscribe(x => Death());
 
@@ -191,7 +204,7 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
             .Subscribe(_ => attackTargetInterface.Damage(attack))
             .AddTo(gameObject);
         //対象の体力を監視し体力がなくなったら攻撃をやめ、移動する
-        attackTargetInterface.UnitHp
+        attackTargetInterface.unitHp
             .Where(x => x <= 0)
             .Subscribe(_ =>
             {
@@ -204,7 +217,7 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
 
     public void Damage(float damage)
     {
-        UnitHp.Value -= damage;
+        unitHp.Value -= damage;
     }
 
     public void Death()

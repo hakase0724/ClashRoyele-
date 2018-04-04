@@ -40,61 +40,9 @@ public static class StaticUse
     }
 
     /// <summary>
-    /// 距離を計算し最も近い建物のTransformを返す
+    /// すべてのストリームをDisPoseする
     /// </summary>
-    /// <param name="myPos">自分の場所</param>
-    /// <param name="transformList">建物のTransformのリスト</param>
-    /// <returns></returns>
-    public static Transform CalcDistance(Transform myPos, List<Transform> transformList,bool isAhead)
-    {
-        if (transformList.Count <= 0) return myPos;
-        //計算した距離を入れるリスト
-        List<float> distances = new List<float>();
-        List<Transform> target = new List<Transform>();
-        //距離を計算しリストに格納
-        foreach (var b in transformList)
-        {
-            float distance;
-            distance = (myPos.position - b.transform.position).sqrMagnitude;
-            target.Add(b);
-            distances.Add(distance);
-        }
-        //最小距離のインデックスを検索する https://qiita.com/Go-zen-chu/items/b546d01fd14ca818d00d ←ここからとったものを改造
-        float ignoreDistance = 2f;
-        var minIdx = distances
-            .Select((val, idx) => new { V = val, I = idx })
-            .Where((min,working) => min.V > ignoreDistance * ignoreDistance)
-            .Aggregate((min, working) => (min.V < working.V) ? min : working).I;
-        return transformList[minIdx];
-    }
-
-    /// <summary>
-    /// 距離を計算し最も近い建物のTransformを返す
-    /// </summary>
-    /// <param name="me">自分の場所</param>
-    /// <param name="targetList">建物のTransformのリスト</param>
-    /// <returns></returns>
-    public static GameObject CalcDistance(GameObject me, List<GameObject> targetList, bool isAhead)
-    {
-        if (targetList.Count <= 0) return me;
-        //計算した距離を入れるリスト
-        List<float> distances = new List<float>();
-        //距離を計算しリストに格納
-        foreach (var b in targetList)
-        {
-            float distance;
-            distance = (me.transform.position - b.transform.position).sqrMagnitude;
-            distances.Add(distance);
-        }
-        //最小距離のインデックスを検索する https://qiita.com/Go-zen-chu/items/b546d01fd14ca818d00d ←ここからとったものを改造
-        float ignoreDistance = 2f;
-        var minIdx = distances
-            .Select((val, idx) => new { V = val, I = idx })
-            .Where((min, working) => min.V > ignoreDistance * ignoreDistance)
-            .Aggregate((min, working) => (min.V < working.V) ? min : working).I;
-        return targetList[minIdx];
-    }
-
+    /// <param name="disposeList">Disposeするストリーム</param>
     public static void AllDispose(List<IDisposable> disposeList)
     {
         foreach(var d in disposeList)
@@ -102,9 +50,27 @@ public static class StaticUse
             d.Dispose();
         }
     }
-
+    /// <summary>
+    /// 2点間の距離を計算する
+    /// </summary>
+    /// <param name="myPos"></param>
+    /// <param name="targetPos"></param>
+    /// <returns></returns>
     public static float CalcDistance(Vector3 myPos, Vector3 targetPos)
     {
         return (myPos - targetPos).sqrMagnitude;
+    }
+    /// <summary>
+    /// 視界に入っているか確認する
+    /// </summary>
+    /// <param name="otherPos">相手の座標</param>
+    /// <param name="myPos">自分の座標</param>
+    /// <param name="viewVector">視界の方向</param>
+    /// <param name="viewAngle">視界の角度</param>
+    /// <returns></returns>
+    public static bool IsLooked(Vector3 otherPos,Vector3 myPos ,Vector3 viewVector,float viewAngle)
+    {
+        if (Vector3.Angle(otherPos - myPos, viewVector) <= viewAngle) return true;
+        else return false;
     }
 }

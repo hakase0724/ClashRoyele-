@@ -34,7 +34,7 @@ public class TestTarget : MonoBehaviour,IBuilding,IUnit
         }
     }
 
-    public float UnitEnergy
+    public float unitEnergy
     {
         get
         {
@@ -47,7 +47,9 @@ public class TestTarget : MonoBehaviour,IBuilding,IUnit
         }
     }
 
-    public FloatReactiveProperty UnitHp
+    public FloatReactiveProperty unitHp { get; set; } = new FloatReactiveProperty(100f);
+
+    public float unitSpeed
     {
         get
         {
@@ -67,12 +69,13 @@ public class TestTarget : MonoBehaviour,IBuilding,IUnit
 
     public void Damage(float damage)
     {
-        throw new NotImplementedException();
+        Debug.Log("ダメージ発生" + damage);
+        unitHp.Value -= damage;
     }
 
     public void Death()
     {
-        throw new NotImplementedException();
+        Destroy(gameObject);
     }
 
     public void EnterTransform()
@@ -97,7 +100,12 @@ public class TestTarget : MonoBehaviour,IBuilding,IUnit
 
     // Use this for initialization
     void Start () {
-		
+        isMine = new BoolReactiveProperty(_IsMine);
+
+
+        unitHp
+            .Where(x => x <= 0)
+            .Subscribe(x => Death());
 	}
 	
 	// Update is called once per frame

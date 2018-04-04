@@ -80,7 +80,7 @@ public class InstantiateFiled : Photon.PunBehaviour
     protected virtual void MyInstantiate(GameObject game,Vector3 pos,int id,float energy)
     {
         var useEnergy = game.GetComponent(typeof(IUnit)) as IUnit;
-        if (!main.IsUseEnergy(useEnergy.UnitEnergy,id,energy)) return;
+        if (!main.IsUseEnergy(useEnergy.unitEnergy,id,energy)) return;
         GameObject gameObject = Instantiate(game, pos, Quaternion.identity);
         var unit = gameObject.GetComponent(typeof(IUnit)) as IUnit;
         unit.MyColor(id);

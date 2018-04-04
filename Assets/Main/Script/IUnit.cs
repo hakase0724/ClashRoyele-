@@ -9,11 +9,11 @@ using UniRx;
 public interface IUnit
 {
     BoolReactiveProperty isMine { get; set; }
-    BoolReactiveProperty isAlive { get; set; }
     //ユニットの体力
-    FloatReactiveProperty UnitHp { get;set;}
+    FloatReactiveProperty unitHp { get;set;}
+    float unitSpeed { get; set; }
     //ユニット生成時のコスト
-    float UnitEnergy { get; set; }
+    float unitEnergy { get; set; }
     /// <summary>
     /// 自機の色を変える
     /// </summary>
