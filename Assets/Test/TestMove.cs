@@ -13,7 +13,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
 {
     public BoolReactiveProperty isMine { get; set; } = new BoolReactiveProperty();
     public FloatReactiveProperty unitHp { get; set; } = new FloatReactiveProperty();
-    public float unitEnergy { get; set; }
+    public float unitEnergy { get; set; } = 1;
     public float unitSpeed { get; set; }
     public float maxUnitHp { get {return _UnitHp; } }
 
@@ -125,7 +125,8 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         foreach (Renderer renderer in renderers)
         {
             renderer.material.color = color[colorNumber];
-        }       
+        }
+        if (!isMine.Value) transform.rotation = Quaternion.Euler(0, 180, 0);    
     }
 
     public void Attack(float attack, GameObject attackTarget)
