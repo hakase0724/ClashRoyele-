@@ -24,7 +24,7 @@ public class BuiidInstantiate : InstantiateFiled
         const int waitFrame = 10;
         //生成者が自分ならwaitFrame分待機
         //相手なら即時生成
-        if(Camera.main.GetComponent<CameraRotation>().IsRotated) pos = new Vector3(pos.x, pos.y, -pos.z);
+        //if(Camera.main.GetComponent<CameraRotation>().IsRotated) pos = new Vector3(pos.x, pos.y, -pos.z);
         if (IsSameId(id, PhotonNetwork.player.ID))
         {
             Observable.TimerFrame(waitFrame)

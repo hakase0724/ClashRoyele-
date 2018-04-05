@@ -25,7 +25,7 @@ public class InstantiateCheck : Photon.MonoBehaviour
     public bool IsInstantiateCheck(Vector3 vector,int id)
     {
         if (!IsSameId(id, PhotonNetwork.player.ID)) return true;
-        if (inputPonit == vector) return true;
-        else return false;
+        if (inputPonit == vector) return false;
+        else return true;
     }
 }

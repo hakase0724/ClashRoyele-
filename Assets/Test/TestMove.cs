@@ -9,7 +9,7 @@ using UnityEngine.AI;
 using UnityEngine.UI;
 using static StaticUse;
 
-public class TestMove : MonoBehaviour,IUnit
+public class TestMove : Photon.MonoBehaviour,IUnit
 {
     public BoolReactiveProperty isMine { get; set; } = new BoolReactiveProperty();
     public FloatReactiveProperty unitHp { get; set; } = new FloatReactiveProperty();
@@ -31,8 +31,14 @@ public class TestMove : MonoBehaviour,IUnit
     private float _UnitHp;
     [SerializeField, Tooltip("自分と相手のときそれぞれの色")]
     private Color[] color = new Color[0];
+
+    private void OnEnable()
+    {
+        nav.enabled = false;
+    }
     private  void Start()
     {
+        nav.enabled = true;
         isMine.Value = _IsMine;
         unitHp.Value = _UnitHp;
         if (isMine.Value)
@@ -56,6 +62,7 @@ public class TestMove : MonoBehaviour,IUnit
             .Where(_ => Input.GetKeyDown(KeyCode.T))
             .Subscribe(_ =>
             {
+                if (targets.Count <= 0) Debug.Log("ないよ");
                 foreach (var m in targets)
                 {
                     Debug.Log(m);
@@ -81,7 +88,7 @@ public class TestMove : MonoBehaviour,IUnit
     private void LeftOrRight()
     {
         float left = CalcDistance(transform.position, targets[0]);
-        float right = CalcDistance(transform.position, targets[2]);
+        float right = CalcDistance(transform.position, targets[targets.Count - 1]);
         if (left > right) targets.Reverse();
     }
     
@@ -97,6 +104,7 @@ public class TestMove : MonoBehaviour,IUnit
             return;
         }
         if (!anim.enabled) anim.enabled = true;
+        if (!nav.enabled) nav.enabled = true;
         nav.destination = targets[targetPointa];
         targetPointa++;
     }
