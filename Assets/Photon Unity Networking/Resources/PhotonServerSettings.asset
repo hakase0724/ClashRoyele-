@@ -45,4 +45,5 @@ MonoBehaviour:
   - RPCTest
   - MyInstantiateRPC
   - End
+  - PosSync
   DisableAutoOpenWizard: 1

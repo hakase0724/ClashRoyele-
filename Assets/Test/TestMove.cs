@@ -25,8 +25,6 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     private Queue<GameObject> targetQueue = new Queue<GameObject>();
     private List<Vector3> targets = new List<Vector3>();
     
-    //[SerializeField]
-    //private bool _IsMine;
     [SerializeField]
     private float _UnitHp;
     [SerializeField, Tooltip("自分と相手のときそれぞれの色")]
@@ -39,21 +37,11 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     private  void Start()
     {
         nav.enabled = true;
-        //isMine.Value = _IsMine;
         unitHp.Value = _UnitHp;
-        if (isMine.Value)
-        {
-            Debug.Log("mine取得");
-            targets.AddRange(targetGet.mine);
-        }
-        else
-        {
-            Debug.Log("enemy取得");
-            targets.AddRange(targetGet.enemys);
-        }
-        LeftOrRight();
-
-        
+        //自分が味方か敵かで対象を変える
+        if (isMine.Value) targets.AddRange(targetGet.mine);
+        else targets.AddRange(targetGet.enemys);
+        LeftOrRight();       
         unitSpeed = 3f;
         //目的地に近づいたときに減速しないようにする
         nav.autoBraking = false;
@@ -84,7 +72,16 @@ public class TestMove : Photon.MonoBehaviour,IUnit
             .Where(x => x <= 0)
             .Subscribe(x => Death())
             .AddTo(gameObject);
+
+        //位置同期間隔（秒）
+        int syncTime = 3;
+        Observable.Interval(TimeSpan.FromSeconds(syncTime))
+            .Subscribe(_ => photonView.RPC(("PosSync"), PhotonTargets.Others, transform.position))
+            .AddTo(gameObject);
     }
+    /// <summary>
+    /// 左右どちらに行くか決定する
+    /// </summary>
     private void LeftOrRight()
     {
         float left = CalcDistance(transform.position, targets[0]);
@@ -166,7 +163,6 @@ public class TestMove : Photon.MonoBehaviour,IUnit
 
     public void Damage(float damage)
     {
-        Debug.Log("ダメージを受ける" + gameObject);
         unitHp.Value -= damage;
     }
 
@@ -181,17 +177,19 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         if (CalcDistance(transform.position, target.transform.position) > targetDistance * targetDistance) return;
         if (targetQueue.Count <= 0)
         {
-            Debug.Log("攻撃を仕掛ける" + target.name);
             GoToTarget(target);
             targetQueue.Enqueue(target);
         }
         else
         {
-            Debug.Log("攻撃を待機" + target.name);
             targetQueue.Enqueue(target);
         }
     }
 
+    /// <summary>
+    /// 対象に向かうことができる状態ならば向かう
+    /// </summary>
+    /// <param name="target">対象</param>
     private void GoToTarget(GameObject target)
     {
         if (nav.pathStatus != NavMeshPathStatus.PathInvalid)
@@ -208,6 +206,13 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         if (otherUnit.isMine.Value == isMine.Value) return;
         TargetLockOn(other.gameObject);
         nav.speed = 0f;
+    }
+
+    [PunRPC]
+    public void PosSync(Vector3 pos)
+    {
+        if (PhotonNetwork.isMasterClient) return;
+        nav.Warp(pos);
     }
 }
 
