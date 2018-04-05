@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 using UniRx.Triggers;
+using Photon;
 using static StaticUse;
 
-public class Piece : Photon.PunBehaviour
+public class Piece : PunBehaviour
 {
     private InstantiateData data => GameObject.FindGameObjectWithTag("Main").GetComponent<InstantiateData>();
     private Main main => GameObject.FindGameObjectWithTag("Main").GetComponent<Main>();
@@ -25,7 +26,8 @@ public class Piece : Photon.PunBehaviour
             .Subscribe(_ =>
             {
                 if (!PhotonNetwork.inRoom) return;
-                photonView.RPC("MyInstantiateRPC", PhotonTargets.All, data.prefabNumber, InputToEvent.inputHitPos, PhotonNetwork.player.ID, main.energy.Value);
+                Debug.Log("データ：" + data.prefabNumber + "、ID：" + PhotonNetwork.player.ID + "、メイン：" + main.energy.Value);
+                photonView.RPC("MyInstantiateRPC", PhotonTargets.All, data.prefabNumber, transform.position, PhotonNetwork.player.ID, main.energy.Value);
             })
             .AddTo(gameObject);
     }
