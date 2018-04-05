@@ -19,9 +19,9 @@ public class HpBar : MonoBehaviour
     {
         var rootComponent = transform.root.GetComponent(typeof(IUnit)) as IUnit;
         var MaxHp = rootComponent.maxUnitHp;
-
-        if (rootComponent.isMine.Value) bar.color = colors.First();
-        else bar.color = colors.Last();
+        Debug.Log(rootComponent.isMine.Value);
+        if (rootComponent.isMine.Value) bar.color = colors[0];
+        else bar.color = colors[1];
 
         rootComponent.unitHp
             .Subscribe(x => slider.value = x / MaxHp)

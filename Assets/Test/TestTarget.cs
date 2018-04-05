@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UniRx;
 using UnityEngine;
 
-public class TestTarget : MonoBehaviour,IBuilding,IUnit
+public class TestTarget :Photon.MonoBehaviour,IBuilding,IUnit
 {
     private Main main => GameObject.FindGameObjectWithTag("Main").GetComponent<Main>();
 
@@ -80,10 +80,16 @@ public class TestTarget : MonoBehaviour,IBuilding,IUnit
             .Where(x => x <= 0)
             .Subscribe(x => Death())
             .AddTo(gameObject);
-	}
+
+        //位置同期間隔（秒）
+        int syncTime = 3;
+        Observable.Interval(TimeSpan.FromSeconds(syncTime))
+            .Subscribe(_ => photonView.RPC(("Sync"), PhotonTargets.Others, unitHp.Value))
+            .AddTo(gameObject);
+    }
 
     [PunRPC]
-    public void Sync(Vector3 pos, float nowHp)
+    public void Sync(float nowHp)
     {
         if (PhotonNetwork.isMasterClient) return;
         unitHp.Value = nowHp;
