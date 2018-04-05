@@ -94,6 +94,7 @@ public class TestTarget :Photon.MonoBehaviour,IBuilding,IUnit
     [PunRPC]
     public void Sync(float nowHp)
     {
+        if (unitHp.Value < nowHp) return;
         var sync = syncTarget.GetComponent(typeof(IUnit)) as IUnit;
         sync.unitHp.Value = nowHp;
     }
@@ -101,6 +102,7 @@ public class TestTarget :Photon.MonoBehaviour,IBuilding,IUnit
     [PunRPC]
     public void DeathSync()
     {
+        (syncTarget.GetComponent(typeof(IUnit)) as IUnit).unitHp.Value = 0f;
         Destroy(syncTarget);
     }
 }
