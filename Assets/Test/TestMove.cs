@@ -73,11 +73,11 @@ public class TestMove : Photon.MonoBehaviour,IUnit
             .Subscribe(x => Death())
             .AddTo(gameObject);
 
-        //位置同期間隔（秒）
-        int syncTime = 3;
-        Observable.Interval(TimeSpan.FromSeconds(syncTime))
-            .Subscribe(_ => photonView.RPC(("Sync"), PhotonTargets.AllViaServer, transform.position,unitHp.Value))
-            .AddTo(gameObject);
+        ////位置同期間隔（秒）
+        //int syncTime = 3;
+        //Observable.Interval(TimeSpan.FromSeconds(syncTime))
+        //    .Subscribe(_ => photonView.RPC(("Sync"), PhotonTargets.AllViaServer, transform.position,unitHp.Value))
+        //    .AddTo(gameObject);
     }
     /// <summary>
     /// 左右どちらに行くか決定する

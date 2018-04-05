@@ -12,6 +12,8 @@ public class TestTarget :Photon.MonoBehaviour,IBuilding,IUnit
     private bool _IsMine;
     [SerializeField, Tooltip("死んだときに発生するポイント")]
     private int deathPoint;
+    [SerializeField]
+    private PhotonView syncTarget;
 
     public BoolReactiveProperty isMine { get; set; } = new BoolReactiveProperty();
 
@@ -85,7 +87,7 @@ public class TestTarget :Photon.MonoBehaviour,IBuilding,IUnit
         //位置同期間隔（秒）
         int syncTime = 3;
         Observable.Interval(TimeSpan.FromSeconds(syncTime))
-            .Subscribe(_ => photonView.RPC(("Sync"), PhotonTargets.AllViaServer, unitHp.Value))
+            .Subscribe(_ => syncTarget.photonView.RPC(("Sync"), PhotonTargets.AllViaServer, unitHp.Value))
             .AddTo(gameObject);
     }
 

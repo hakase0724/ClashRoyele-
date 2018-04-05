@@ -47,4 +47,5 @@ MonoBehaviour:
   - End
   - PosSync
   - Sync
+  - DeathSync
   DisableAutoOpenWizard: 1
