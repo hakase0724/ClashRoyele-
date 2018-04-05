@@ -154,7 +154,7 @@ Prefab:
     - target: {fileID: 224149877922017216, guid: 75ab14c9622a5cb4c8594697b10ca044,
         type: 2}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -80
       objectReference: {fileID: 0}
     - target: {fileID: 23228877166133224, guid: 75ab14c9622a5cb4c8594697b10ca044,
         type: 2}
@@ -352,7 +352,7 @@ Prefab:
     - target: {fileID: 224857665588517840, guid: e9a03090613f34a43b03bca4f17b55a1,
         type: 2}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -80
       objectReference: {fileID: 0}
     - target: {fileID: 23234165576377254, guid: e9a03090613f34a43b03bca4f17b55a1,
         type: 2}
@@ -730,7 +730,7 @@ Prefab:
     - target: {fileID: 224244620224182982, guid: 36687defd936fe44c9e209bfef4c7397,
         type: 2}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -80
       objectReference: {fileID: 0}
     - target: {fileID: 23552583104596700, guid: 36687defd936fe44c9e209bfef4c7397,
         type: 2}
@@ -891,7 +891,7 @@ Prefab:
     - target: {fileID: 224993551906975132, guid: 072fad76e8ce02a47a24a2af13d53fad,
         type: 2}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -80
       objectReference: {fileID: 0}
     - target: {fileID: 23373399738741610, guid: 072fad76e8ce02a47a24a2af13d53fad,
         type: 2}
@@ -1217,7 +1217,7 @@ Prefab:
     - target: {fileID: 224730927704119860, guid: 720cb14189071ce4c945da098fc256b1,
         type: 2}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -80
       objectReference: {fileID: 0}
     - target: {fileID: 23379428907810138, guid: 720cb14189071ce4c945da098fc256b1,
         type: 2}
@@ -1580,7 +1580,18 @@ Prefab:
       propertyPath: m_RootOrder
       value: 7
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 114552269510642786, guid: c2f3872dccc74354494c4c9574690b38,
+        type: 2}
+      propertyPath: viewIdField
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114552269510642786, guid: c2f3872dccc74354494c4c9574690b38,
+        type: 2}
+      propertyPath: instantiationId
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 114552269510642786, guid: c2f3872dccc74354494c4c9574690b38, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: c2f3872dccc74354494c4c9574690b38, type: 2}
   m_IsPrefabParent: 0
 --- !u!1 &1283093221
@@ -1594,6 +1605,7 @@ GameObject:
   - component: {fileID: 1283093222}
   - component: {fileID: 1283093224}
   - component: {fileID: 1283093225}
+  - component: {fileID: 1283093226}
   m_Layer: 0
   m_Name: Scripts
   m_TagString: Main
@@ -1650,7 +1662,7 @@ MonoBehaviour:
   - {fileID: 0}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 8
-  instantiationId: 8
+  instantiationId: 1
   currentMasterID: -1
   isRuntimeInstantiated: 0
 --- !u!114 &1283093225
@@ -1670,6 +1682,32 @@ MonoBehaviour:
   - {fileID: 1419087144429186, guid: bb19ec97c90ac3b44a8803f89e3d364f, type: 2}
   - {fileID: 1419087144429186, guid: bb19ec97c90ac3b44a8803f89e3d364f, type: 2}
   instantiateCheck: {fileID: 373946978}
+--- !u!114 &1283093226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1283093221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerId: 0
+  group: 0
+  OwnerShipWasTransfered: 0
+  prefixBackup: -1
+  synchronization: 0
+  onSerializeTransformOption: 3
+  onSerializeRigidBodyOption: 2
+  ownershipTransfer: 2
+  ObservedComponents:
+  - {fileID: 0}
+  ObservedComponentsFoldoutOpen: 1
+  viewIdField: 1
+  instantiationId: 1
+  currentMasterID: -1
+  isRuntimeInstantiated: 0
 --- !u!1001 &1386258357
 Prefab:
   m_ObjectHideFlags: 0
@@ -1712,7 +1750,7 @@ Prefab:
     - target: {fileID: 224923843064406302, guid: 240bbb55c5e686640931e8c94e131ad8,
         type: 2}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -80
       objectReference: {fileID: 0}
     - target: {fileID: 23806703303820784, guid: 240bbb55c5e686640931e8c94e131ad8,
         type: 2}

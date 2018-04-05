@@ -8888,6 +8888,7 @@ GameObject:
   - component: {fileID: 65974858449188152}
   - component: {fileID: 23817503696324952}
   - component: {fileID: 114649232119081574}
+  - component: {fileID: 114552269510642786}
   m_Layer: 0
   m_Name: main
   m_TagString: Untagged
@@ -55921,6 +55922,32 @@ MonoBehaviour:
   color:
   - {r: 1, g: 1, b: 1, a: 0}
   - {r: 0.7019608, g: 0.34901962, b: 0, a: 1}
+--- !u!114 &114552269510642786
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1740880933277532}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerId: 0
+  group: 0
+  OwnerShipWasTransfered: 0
+  prefixBackup: -1
+  synchronization: 0
+  onSerializeTransformOption: 3
+  onSerializeRigidBodyOption: 2
+  ownershipTransfer: 0
+  ObservedComponents:
+  - {fileID: 0}
+  ObservedComponentsFoldoutOpen: 1
+  viewIdField: 0
+  instantiationId: -1
+  currentMasterID: -1
+  isRuntimeInstantiated: 0
 --- !u!114 &114553714528952044
 MonoBehaviour:
   m_ObjectHideFlags: 1
