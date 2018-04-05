@@ -43,6 +43,7 @@ public class TestTarget :Photon.MonoBehaviour,IBuilding,IUnit
     public void Death()
     {
         if (!isMine.Value) main.EnemyCount(deathPoint);
+        photonView.RPC(("DeathSync"), PhotonTargets.AllViaServer);
         Destroy(gameObject);
     }
 
@@ -84,14 +85,19 @@ public class TestTarget :Photon.MonoBehaviour,IBuilding,IUnit
         //位置同期間隔（秒）
         int syncTime = 3;
         Observable.Interval(TimeSpan.FromSeconds(syncTime))
-            .Subscribe(_ => photonView.RPC(("Sync"), PhotonTargets.Others, unitHp.Value))
+            .Subscribe(_ => photonView.RPC(("Sync"), PhotonTargets.AllViaServer, unitHp.Value))
             .AddTo(gameObject);
     }
 
     [PunRPC]
     public void Sync(float nowHp)
     {
-        if (PhotonNetwork.isMasterClient) return;
         unitHp.Value = nowHp;
+    }
+
+    [PunRPC]
+    public void DeathSync()
+    {
+        Destroy(gameObject);
     }
 }

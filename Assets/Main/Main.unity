@@ -159,6 +159,11 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 072fad76e8ce02a47a24a2af13d53fad, type: 2}
   m_IsPrefabParent: 0
+--- !u!4 &71720630 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 4592507788594848, guid: 072fad76e8ce02a47a24a2af13d53fad,
+    type: 2}
+  m_PrefabInternal: {fileID: 71720629}
 --- !u!1001 &207485748
 Prefab:
   m_ObjectHideFlags: 0
@@ -206,6 +211,11 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 240bbb55c5e686640931e8c94e131ad8, type: 2}
   m_IsPrefabParent: 0
+--- !u!4 &207485749 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 4050963863866342, guid: 240bbb55c5e686640931e8c94e131ad8,
+    type: 2}
+  m_PrefabInternal: {fileID: 207485748}
 --- !u!1 &214601852 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 1783784092159614, guid: 75ab14c9622a5cb4c8594697b10ca044,
@@ -226,12 +236,12 @@ MonoBehaviour:
   group: 0
   OwnerShipWasTransfered: 0
   prefixBackup: -1
-  synchronization: 0
+  synchronization: 3
   onSerializeTransformOption: 3
   onSerializeRigidBodyOption: 2
   ownershipTransfer: 2
   ObservedComponents:
-  - {fileID: 0}
+  - {fileID: 985520141}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 6
   instantiationId: 6
@@ -378,12 +388,12 @@ MonoBehaviour:
   group: 0
   OwnerShipWasTransfered: 0
   prefixBackup: -1
-  synchronization: 0
+  synchronization: 3
   onSerializeTransformOption: 3
   onSerializeRigidBodyOption: 2
   ownershipTransfer: 2
   ObservedComponents:
-  - {fileID: 0}
+  - {fileID: 692644481}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 5
   instantiationId: 5
@@ -710,12 +720,12 @@ MonoBehaviour:
   group: 0
   OwnerShipWasTransfered: 0
   prefixBackup: -1
-  synchronization: 0
+  synchronization: 3
   onSerializeTransformOption: 3
   onSerializeRigidBodyOption: 2
   ownershipTransfer: 2
   ObservedComponents:
-  - {fileID: 0}
+  - {fileID: 1042118655}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 9
   instantiationId: 9
@@ -825,12 +835,12 @@ MonoBehaviour:
   group: 0
   OwnerShipWasTransfered: 0
   prefixBackup: -1
-  synchronization: 0
+  synchronization: 3
   onSerializeTransformOption: 3
   onSerializeRigidBodyOption: 2
   ownershipTransfer: 2
   ObservedComponents:
-  - {fileID: 0}
+  - {fileID: 71720630}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 4
   instantiationId: 4
@@ -951,6 +961,11 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e9a03090613f34a43b03bca4f17b55a1, type: 2}
   m_IsPrefabParent: 0
+--- !u!4 &692644481 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 4590244340529330, guid: e9a03090613f34a43b03bca4f17b55a1,
+    type: 2}
+  m_PrefabInternal: {fileID: 692644480}
 --- !u!1 &879989156
 GameObject:
   m_ObjectHideFlags: 0
@@ -1184,6 +1199,11 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 75ab14c9622a5cb4c8594697b10ca044, type: 2}
   m_IsPrefabParent: 0
+--- !u!4 &985520141 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 4347320408821648, guid: 75ab14c9622a5cb4c8594697b10ca044,
+    type: 2}
+  m_PrefabInternal: {fileID: 985520140}
 --- !u!1 &1006094897 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 1850099772440540, guid: 720cb14189071ce4c945da098fc256b1,
@@ -1204,12 +1224,12 @@ MonoBehaviour:
   group: 0
   OwnerShipWasTransfered: 0
   prefixBackup: -1
-  synchronization: 0
+  synchronization: 3
   onSerializeTransformOption: 3
   onSerializeRigidBodyOption: 2
   ownershipTransfer: 2
   ObservedComponents:
-  - {fileID: 0}
+  - {fileID: 1790223754}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 3
   instantiationId: 3
@@ -1262,6 +1282,11 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 36687defd936fe44c9e209bfef4c7397, type: 2}
   m_IsPrefabParent: 0
+--- !u!4 &1042118655 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 4901939620375592, guid: 36687defd936fe44c9e209bfef4c7397,
+    type: 2}
+  m_PrefabInternal: {fileID: 1042118654}
 --- !u!1 &1071590222
 GameObject:
   m_ObjectHideFlags: 0
@@ -1692,10 +1717,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabs:
-  - {fileID: 1419087144429186, guid: bb19ec97c90ac3b44a8803f89e3d364f, type: 2}
-  - {fileID: 1419087144429186, guid: bb19ec97c90ac3b44a8803f89e3d364f, type: 2}
-  - {fileID: 1419087144429186, guid: bb19ec97c90ac3b44a8803f89e3d364f, type: 2}
-  - {fileID: 1419087144429186, guid: bb19ec97c90ac3b44a8803f89e3d364f, type: 2}
+  - {fileID: 1715348809274210, guid: bb19ec97c90ac3b44a8803f89e3d364f, type: 2}
+  - {fileID: 1715348809274210, guid: bb19ec97c90ac3b44a8803f89e3d364f, type: 2}
+  - {fileID: 1715348809274210, guid: bb19ec97c90ac3b44a8803f89e3d364f, type: 2}
+  - {fileID: 1715348809274210, guid: bb19ec97c90ac3b44a8803f89e3d364f, type: 2}
   instantiateCheck: {fileID: 373946978}
 --- !u!114 &1283093226
 MonoBehaviour:
@@ -1719,7 +1744,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 0}
   ObservedComponentsFoldoutOpen: 1
-  viewIdField: 1
+  viewIdField: 10
   instantiationId: 8
   currentMasterID: -1
   isRuntimeInstantiated: 0
@@ -1743,12 +1768,12 @@ MonoBehaviour:
   group: 0
   OwnerShipWasTransfered: 0
   prefixBackup: -1
-  synchronization: 0
+  synchronization: 3
   onSerializeTransformOption: 3
   onSerializeRigidBodyOption: 2
   ownershipTransfer: 2
   ObservedComponents:
-  - {fileID: 0}
+  - {fileID: 207485749}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 2
   instantiationId: 2
@@ -1984,6 +2009,11 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 720cb14189071ce4c945da098fc256b1, type: 2}
   m_IsPrefabParent: 0
+--- !u!4 &1790223754 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 4834881960894330, guid: 720cb14189071ce4c945da098fc256b1,
+    type: 2}
+  m_PrefabInternal: {fileID: 1790223753}
 --- !u!1 &1869647827
 GameObject:
   m_ObjectHideFlags: 0
