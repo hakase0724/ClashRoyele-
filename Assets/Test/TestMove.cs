@@ -25,8 +25,8 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     private Queue<GameObject> targetQueue = new Queue<GameObject>();
     private List<Vector3> targets = new List<Vector3>();
     
-    [SerializeField]
-    private bool _IsMine;
+    //[SerializeField]
+    //private bool _IsMine;
     [SerializeField]
     private float _UnitHp;
     [SerializeField, Tooltip("自分と相手のときそれぞれの色")]
@@ -39,7 +39,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     private  void Start()
     {
         nav.enabled = true;
-        isMine.Value = _IsMine;
+        //isMine.Value = _IsMine;
         unitHp.Value = _UnitHp;
         if (isMine.Value)
         {
