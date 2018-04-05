@@ -13,7 +13,7 @@ public class Main : Photon.MonoBehaviour
     public FloatReactiveProperty energy { get; private set; } = new FloatReactiveProperty(3);
     //プレイヤーデータをやり取りするための領域
     public PlayerData playerData { get; private set; }
-    public IntReactiveProperty enemyCount { get; private set; } = new IntReactiveProperty(0);
+    public IntReactiveProperty enemyCount { get; private set; } = new IntReactiveProperty(3);
     //エネルギーを表示するバー
     [SerializeField]
     private Slider slider;
@@ -45,6 +45,9 @@ public class Main : Photon.MonoBehaviour
             .Where(_=>slider.value <= 1)
             //現在のenergyの値を10分の１にしてゲージに反映させる
             .Subscribe(x => slider.value = x / 10);
+
+        this.UpdateAsObservable()
+            .Subscribe(_ => Debug.Log(enemyCount.Value));
 
         enemyCount
             .Buffer(2,1)

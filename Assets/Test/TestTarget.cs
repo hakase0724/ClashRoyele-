@@ -44,7 +44,7 @@ public class TestTarget :Photon.MonoBehaviour,IBuilding,IUnit
 
     public void Death()
     {
-        if (!isMine.Value) main.EnemyCount(deathPoint);
+        if (!isMine.Value) main.EnemyCount(-deathPoint);
         photonView.RPC(("DeathSync"), PhotonTargets.AllViaServer);
         Destroy(gameObject);
     }
@@ -103,6 +103,6 @@ public class TestTarget :Photon.MonoBehaviour,IBuilding,IUnit
     public void DeathSync()
     {
         (syncTarget.GetComponent(typeof(IUnit)) as IUnit).unitHp.Value = 0f;
-        Destroy(syncTarget);
+        //Destroy(syncTarget);
     }
 }
