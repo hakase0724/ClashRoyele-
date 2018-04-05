@@ -29,6 +29,13 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     private float _UnitHp;
     [SerializeField, Tooltip("自分と相手のときそれぞれの色")]
     private Color[] color = new Color[0];
+    [SerializeField, Tooltip("攻撃力")]
+    private float attackPower;
+    [SerializeField, Tooltip("ロックオンする距離")]
+    private float targetDistance;
+    [SerializeField, Tooltip("ユニットの移動速度")]
+    private float _UnitSpeed;
+
 
     private void OnEnable()
     {
@@ -42,28 +49,18 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         if (isMine.Value) targets.AddRange(targetGet.mine);
         else targets.AddRange(targetGet.enemys);
         LeftOrRight();       
-        unitSpeed = 3f;
+        unitSpeed = _UnitSpeed;
         //目的地に近づいたときに減速しないようにする
         nav.autoBraking = false;
 
-        this.UpdateAsObservable()
-            .Where(_ => Input.GetKeyDown(KeyCode.T))
-            .Subscribe(_ =>
-            {
-                if (targets.Count <= 0) Debug.Log("ないよ");
-                foreach (var m in targets)
-                {
-                    Debug.Log(m);
-                }
-            });
-
         //動き出しを指定時間遅らせる
-        const int waitTime = 2;
+        int waitTime = 2;
         var startTimer = Observable.Timer(TimeSpan.FromSeconds(waitTime));
 
         this.UpdateAsObservable()
             .SkipUntil(startTimer)
             .Where(_ => !nav.pathPending)
+            //対象との距離が0.5未満になったら到着したと判断する
             .Where(_ => nav.remainingDistance < 0.5f)
             .Subscribe(_ => Move())
             .AddTo(gameObject);
@@ -72,12 +69,6 @@ public class TestMove : Photon.MonoBehaviour,IUnit
             .Where(x => x <= 0)
             .Subscribe(x => Death())
             .AddTo(gameObject);
-
-        ////位置同期間隔（秒）
-        //int syncTime = 3;
-        //Observable.Interval(TimeSpan.FromSeconds(syncTime))
-        //    .Subscribe(_ => photonView.RPC(("Sync"), PhotonTargets.AllViaServer, transform.position,unitHp.Value))
-        //    .AddTo(gameObject);
     }
     /// <summary>
     /// 左右どちらに行くか決定する
@@ -139,6 +130,11 @@ public class TestMove : Photon.MonoBehaviour,IUnit
             .AddTo(gameObject);
     }
 
+    /// <summary>
+    /// 実際の攻撃処理
+    /// </summary>
+    /// <param name="attack">攻撃力</param>
+    /// <param name="target">対象</param>
     private void Attack(float attack, IUnit target)
     {
         target.Damage(attack);
@@ -146,6 +142,9 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         nav.speed = 0f;
     }
 
+    /// <summary>
+    /// 敵を倒した時の処理
+    /// </summary>
     private void Comp()
     {
         if (targetQueue.Count >= 1) targetQueue.Dequeue();
@@ -173,9 +172,12 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         Destroy(gameObject);
     }
 
+    /// <summary>
+    /// 対象との距離を計算しロックオンする距離内であればロックオンする
+    /// </summary>
+    /// <param name="target">対象</param>
     private void TargetLockOn(GameObject target)
     {
-        float targetDistance = 5f;
         if (CalcDistance(transform.position, target.transform.position) > targetDistance * targetDistance) return;
         if (targetQueue.Count <= 0)
         {
@@ -194,22 +196,25 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     /// <param name="target">対象</param>
     private void GoToTarget(GameObject target)
     {
-        if (nav.pathStatus != NavMeshPathStatus.PathInvalid)
-        {
-            nav.destination = target.transform.position;
-        }       
-        Attack(10f, target);
+        if (nav.pathStatus != NavMeshPathStatus.PathInvalid) nav.destination = target.transform.position;
+        Attack(attackPower, target);
     }
 
     private void OnTriggerEnter(Collider other)
     {
         var otherUnit = other.GetComponent(typeof(IUnit)) as IUnit;
         if (otherUnit == null) return;
+        //同一生成者なら無視する
         if (otherUnit.isMine.Value == isMine.Value) return;
         TargetLockOn(other.gameObject);
         nav.speed = 0f;
     }
-
+    /// <summary>
+    /// 位置と体力を同期する
+    /// マスタークライアントが基準
+    /// </summary>
+    /// <param name="pos">同期する位置</param>
+    /// <param name="nowHp">同期する体力</param>
     [PunRPC]
     public void Sync(Vector3 pos,float nowHp)
     {
