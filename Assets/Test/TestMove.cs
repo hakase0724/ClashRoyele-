@@ -212,7 +212,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     public void PosSync(Vector3 pos)
     {
         if (PhotonNetwork.isMasterClient) return;
-        nav.Warp(pos);
+        nav.Warp(new Vector3(-pos.x,pos.y,-pos.z));
     }
 }
 
