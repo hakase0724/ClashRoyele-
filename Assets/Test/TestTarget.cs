@@ -6,8 +6,12 @@ using UnityEngine;
 
 public class TestTarget : MonoBehaviour,IBuilding,IUnit
 {
+    private Main main => GameObject.FindGameObjectWithTag("Main").GetComponent<Main>();
+
     [SerializeField]
     private bool _IsMine;
+    [SerializeField, Tooltip("死んだときに発生するポイント")]
+    private int deathPoint;
 
     public BoolReactiveProperty isMine { get; set; } = new BoolReactiveProperty();
 
@@ -38,6 +42,7 @@ public class TestTarget : MonoBehaviour,IBuilding,IUnit
 
     public void Death()
     {
+        if (!isMine.Value) main.EnemyCount(deathPoint);
         Destroy(gameObject);
     }
 
@@ -73,6 +78,14 @@ public class TestTarget : MonoBehaviour,IBuilding,IUnit
 
         unitHp
             .Where(x => x <= 0)
-            .Subscribe(x => Death());
+            .Subscribe(x => Death())
+            .AddTo(gameObject);
 	}
+
+    [PunRPC]
+    public void Sync(Vector3 pos, float nowHp)
+    {
+        if (PhotonNetwork.isMasterClient) return;
+        unitHp.Value = nowHp;
+    }
 }

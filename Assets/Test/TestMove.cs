@@ -76,7 +76,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         //位置同期間隔（秒）
         int syncTime = 3;
         Observable.Interval(TimeSpan.FromSeconds(syncTime))
-            .Subscribe(_ => photonView.RPC(("PosSync"), PhotonTargets.Others, transform.position))
+            .Subscribe(_ => photonView.RPC(("Sync"), PhotonTargets.Others, transform.position,unitHp.Value))
             .AddTo(gameObject);
     }
     /// <summary>
@@ -209,10 +209,11 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     }
 
     [PunRPC]
-    public void PosSync(Vector3 pos)
+    public void Sync(Vector3 pos,float nowHp)
     {
         if (PhotonNetwork.isMasterClient) return;
         nav.Warp(new Vector3(-pos.x,pos.y,-pos.z));
+        unitHp.Value = nowHp;
     }
 }
 
