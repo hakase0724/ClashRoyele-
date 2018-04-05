@@ -151,6 +151,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         if (targetQueue.Count >= 1) GoToTarget(targetQueue.Peek());
         else
         {
+            if (targets.Count <= targetPointa) return;
             if (nav.pathStatus != NavMeshPathStatus.PathInvalid)
             {
                 nav.destination = targets[targetPointa];
