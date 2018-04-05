@@ -147,7 +147,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
 
     private void Comp()
     {
-        targetQueue.Dequeue();
+        if (targetQueue.Count >= 1) targetQueue.Dequeue();
         if (targetQueue.Count >= 1) GoToTarget(targetQueue.Peek());
         else
         {
