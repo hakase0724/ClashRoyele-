@@ -95,8 +95,8 @@ public class TestTarget :Photon.MonoBehaviour,IBuilding,IUnit
     public void Sync(float nowHp)
     {
         var sync = syncTarget.GetComponent(typeof(IUnit)) as IUnit;
-        if (sync.unitHp.Value < nowHp) return;       
-        sync.unitHp.Value = nowHp;
+        if (sync.unitHp.Value < nowHp) return;
+        sync.Damage(sync.unitHp.Value - nowHp);
     }
 
     [PunRPC]
