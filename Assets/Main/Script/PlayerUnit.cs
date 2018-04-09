@@ -25,7 +25,7 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
     //自身の状態
     private Stetas stetas;
     //自分が左右どちらにいるか
-    private RootStetas.LRStetas myStetas;
+    private RootStetas.LRStates myStetas;
     //自分の進行ルート
     private List<RootStetas> myRoot = new List<RootStetas>();
     private Queue<GameObject> targetEnemy = new Queue<GameObject>();
@@ -77,17 +77,17 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
 
     private void Start()
     {
-        if (transform.position.x <= 0) myStetas = RootStetas.LRStetas.Left;
-        else myStetas = RootStetas.LRStetas.Right;
+        if (transform.position.x <= 0) myStetas = RootStetas.LRStates.Left;
+        else myStetas = RootStetas.LRStates.Right;
         //自分のステータスによってルートを決める
         if (isMine.Value)
         {
             switch (myStetas)
             {
-                case RootStetas.LRStetas.Left:
+                case RootStetas.LRStates.Left:
                     myRoot = stageScript.GetComponent<BulidingsManeger>().LeftRoot;
                     break;
-                case RootStetas.LRStetas.Right:
+                case RootStetas.LRStates.Right:
                     myRoot = stageScript.GetComponent<BulidingsManeger>().RightRoot;
                     break;
             }
@@ -97,10 +97,10 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
         {
             switch (myStetas)
             {
-                case RootStetas.LRStetas.Left:
+                case RootStetas.LRStates.Left:
                     myRoot = stageScript.GetComponent<BulidingsManeger>().LeftEnemyRoot;
                     break;
-                case RootStetas.LRStetas.Right:
+                case RootStetas.LRStates.Right:
                     myRoot = stageScript.GetComponent<BulidingsManeger>().RightEnemyRoot;
                     break;
             }
@@ -277,10 +277,10 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
         {
             switch (myStetas)
             {
-                case RootStetas.LRStetas.Left:
+                case RootStetas.LRStates.Left:
                     rb.velocity = transform.right;
                     break;
-                case RootStetas.LRStetas.Right:
+                case RootStetas.LRStates.Right:
                     rb.velocity = -transform.right;
                     break;
             }

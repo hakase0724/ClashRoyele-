@@ -57,11 +57,11 @@ public class BulidingsManeger : MonoBehaviour
         //Debug.Log("挿入場所" + rootStetas.number);
         switch (rootStetas.stetas)
         {
-            case RootStetas.LRStetas.Left:
+            case RootStetas.LRStates.Left:
                 LeftRoot.Add(rootStetas);
                 LeftRoot.Sort((x, y) => x.number - y.number);
                 break;
-            case RootStetas.LRStetas.Right:
+            case RootStetas.LRStates.Right:
                 RightRoot.Add(rootStetas);
                 RightRoot.Sort((x, y) => x.number - y.number);
                 break;

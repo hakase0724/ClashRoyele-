@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TestTargetObject : MonoBehaviour {
+public class TestTargetObject : MonoBehaviour
+{
+    [SerializeField]
+    private RootStetas.LRStates state;
+    [SerializeField]
+    private int rootNumber;
+    
 
-	// Use this for initialization
-	void Start () {
-        
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+	void Start ()
+    {
+        RootStetas rootStates = new RootStetas(state, rootNumber, gameObject);
+        GameObject.FindGameObjectWithTag("Main").GetComponent<TestManeger>().InsertRoot(rootStates);
 	}
 }

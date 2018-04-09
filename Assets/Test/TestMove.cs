@@ -36,7 +36,6 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     [SerializeField, Tooltip("ユニットの移動速度")]
     private float _UnitSpeed;
 
-
     private void OnEnable()
     {
         nav.enabled = false;
@@ -69,22 +68,8 @@ public class TestMove : Photon.MonoBehaviour,IUnit
             .Where(x => x <= 0)
             .Subscribe(x => Death())
             .AddTo(gameObject);
-
-        Observable.Interval(System.TimeSpan.FromSeconds(3))
-            .Subscribe(_ =>
-            {
-                Debug.Log("同期テスト");
-                photonView.RPC("PosSync", PhotonTargets.Others, transform.position);
-            })
-            .AddTo(gameObject);
     }
 
-    [PunRPC]
-    public void PosSync(Vector3 pos)
-    {
-        if (PhotonNetwork.isMasterClient) return;
-        nav.Warp(-pos);
-    }
     /// <summary>
     /// 左右どちらに行くか決定する
     /// </summary>
@@ -245,6 +230,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     public void Sync(Vector3 pos,float nowHp)
     {
         if (PhotonNetwork.isMasterClient) return;
+        if (CalcDistance(transform.position, pos) <= 10) return;
         nav.Warp(new Vector3(-pos.x,pos.y,-pos.z));
         unitHp.Value = nowHp;
     }

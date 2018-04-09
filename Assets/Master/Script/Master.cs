@@ -39,7 +39,7 @@ public class Master : Photon.PunBehaviour
         this.UpdateAsObservable()
             .Select(x => PhotonNetwork.playerList.Length)
             .Where(x => x >= playMemberNum)
-            .Subscribe(_ => SceneLoad("Main"));
+            .Subscribe(_ => SceneLoad("Test 1"));
     }
     
     /// <summary>

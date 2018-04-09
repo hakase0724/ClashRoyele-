@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon;
 
-public class TestCreate : MonoBehaviour
+public class TestCreate : Photon.MonoBehaviour
 {
     public GameObject obj;
 
@@ -24,7 +25,8 @@ public class TestCreate : MonoBehaviour
             {
                 Debug.Log("生成位置" + hit.point);
                 //レイが当たった位置(hit.point)にオブジェクトを生成する
-                Instantiate(obj, hit.point, Quaternion.identity);
+                PhotonNetwork.Instantiate(obj.name, hit.point, Quaternion.identity,0);
+                //Instantiate(obj, hit.point, Quaternion.identity);
             }
         }
     }

@@ -4,17 +4,17 @@ using UnityEngine;
 
 public class RootStetas
 {
-    public enum LRStetas
+    public enum LRStates
     {
         Left,
         Right
     }
 
-    public LRStetas stetas;
+    public LRStates stetas;
     public int number;
     public GameObject rootObject;
 
-    public RootStetas(LRStetas stetas,int number,GameObject gameObject)
+    public RootStetas(LRStates stetas,int number,GameObject gameObject)
     {
         this.stetas = stetas;
         this.number = number;

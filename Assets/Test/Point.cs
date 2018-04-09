@@ -6,7 +6,7 @@ public class Point : MonoBehaviour
 {
     public RootStetas rootStetas { get; private set; }
     [SerializeField]
-    private RootStetas.LRStetas myLRStetas;
+    private RootStetas.LRStates myLRStetas;
     [SerializeField]
     private int rootNumber;
 
