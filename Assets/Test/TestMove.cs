@@ -70,7 +70,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
             .Subscribe(x => Death())
             .AddTo(gameObject);
 
-        Observable.IntervalFrame(3)
+        Observable.Interval(System.TimeSpan.FromSeconds(3))
             .Subscribe(_ =>
             {
                 Debug.Log("同期テスト");
