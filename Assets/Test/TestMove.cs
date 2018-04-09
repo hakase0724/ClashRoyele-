@@ -69,14 +69,29 @@ public class TestMove : Photon.MonoBehaviour,IUnit
             .Where(x => x <= 0)
             .Subscribe(x => Death())
             .AddTo(gameObject);
+
+        Observable.IntervalFrame(3)
+            .Subscribe(_ =>
+            {
+                Debug.Log("同期テスト");
+                photonView.RPC("PosSync", PhotonTargets.Others, transform.position);
+            })
+            .AddTo(gameObject);
+    }
+
+    [PunRPC]
+    public void PosSync(Vector3 pos)
+    {
+        if (PhotonNetwork.isMasterClient) return;
+        nav.Warp(-pos);
     }
     /// <summary>
     /// 左右どちらに行くか決定する
     /// </summary>
     private void LeftOrRight()
     {
-        float left = CalcDistance(transform.position, targets[0]);
-        float right = CalcDistance(transform.position, targets[targets.Count - 1]);
+        float left = CalcDistance(transform.position, targets.First());
+        float right = CalcDistance(transform.position, targets.Last());
         if (left > right) targets.Reverse();
     }
     
