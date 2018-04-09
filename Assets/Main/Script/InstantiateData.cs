@@ -38,6 +38,7 @@ public class InstantiateData :Photon.MonoBehaviour
 
     public void MyInstantiate(int num, Vector3 pos, int id, float energy)
     {
+        if (!IsInstantiateCheck(pos, id)) return;
         var useEnergy = Prefab(num).GetComponent(typeof(IUnit)) as IUnit;
         if (!main.IsUseEnergy(useEnergy.unitEnergy, id, energy)) return;
         photonView.RPC("MyInstantiateRPC", PhotonTargets.All, num, pos, id, energy);
@@ -46,7 +47,7 @@ public class InstantiateData :Photon.MonoBehaviour
     [PunRPC]
     private IEnumerator MyInstantiateRPC(int num, Vector3 pos, int id, float energy)
     {
-        if (!IsInstantiateCheck(pos, id)) yield break;
+        //if (!IsInstantiateCheck(pos, id)) yield break;
         //生成待機時間
         const int waitFrame = 20;
         //生成者が自分ならwaitFrame分待機
