@@ -16,7 +16,7 @@ public class NavTest : Photon.MonoBehaviour
     private NavMeshAgent nav => GetComponent<NavMeshAgent>();
     private void Awake()
     {
-        if (!photonView.isMine) transform.position = -transform.position;
+        if (!photonView.isMine) transform.position = new Vector3(-transform.position.x, transform.position.y, -transform.position.z);
     }
 	// Use this for initialization
 	void Start ()
