@@ -70,7 +70,7 @@ public class InstantiateData :Photon.MonoBehaviour
     /// <param name="id">生成者ID</param>
     private void MyInstantiate(GameObject game, Vector3 pos, int id, float energy)
     {
-        GameObject gameObject /*= Instantiate(game, pos, Quaternion.identity)*/;
+        GameObject gameObject;
         if (IsSameId(id, PhotonNetwork.player.ID)) gameObject = Instantiate(game, pos, Quaternion.identity);
         else gameObject = Instantiate(game, new Vector3(-pos.x, pos.y, -pos.z), Quaternion.identity);
         var unit = gameObject.GetComponent(typeof(IUnit)) as IUnit;
