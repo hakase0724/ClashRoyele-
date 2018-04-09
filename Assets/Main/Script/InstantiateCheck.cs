@@ -9,11 +9,11 @@ using static StaticUse;
 /// </summary>
 public class InstantiateCheck : Photon.MonoBehaviour
 {
-    private Vector3 inputPonit;
+    private Vector3 inputPoint;
 
     public void Click()
     {
-        inputPonit = InputToEvent.inputHitPos;
+        inputPoint = InputToEvent.inputHitPos;
     }
 
     /// <summary>
@@ -24,8 +24,8 @@ public class InstantiateCheck : Photon.MonoBehaviour
     /// <returns></returns>
     public bool IsInstantiateCheck(Vector3 vector,int id)
     {
-        if (!IsSameId(id, PhotonNetwork.player.ID)) return true;
-        if (inputPonit == vector) return false;
+        //if (!IsSameId(id, PhotonNetwork.player.ID)) return true;
+        if (inputPoint == vector) return false;
         else return true;
     }
 }
