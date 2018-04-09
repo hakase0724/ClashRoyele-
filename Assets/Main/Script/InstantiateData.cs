@@ -38,7 +38,6 @@ public class InstantiateData :Photon.MonoBehaviour
 
     public void MyInstantiate(int num, Vector3 pos, int id, float energy)
     {
-        if (!IsInstantiateCheck(pos, id)) return;
         var useEnergy = Prefab(num).GetComponent(typeof(IUnit)) as IUnit;
         if (!main.IsUseEnergy(useEnergy.unitEnergy, id, energy)) return;
         photonView.RPC("MyInstantiateRPC", PhotonTargets.All, num, pos, id, energy);
@@ -47,7 +46,6 @@ public class InstantiateData :Photon.MonoBehaviour
     [PunRPC]
     private IEnumerator MyInstantiateRPC(int num, Vector3 pos, int id, float energy)
     {
-        //if (!IsInstantiateCheck(pos, id)) yield break;
         //生成待機時間
         const int waitFrame = 20;
         //生成者が自分ならwaitFrame分待機
@@ -72,8 +70,6 @@ public class InstantiateData :Photon.MonoBehaviour
     /// <param name="id">生成者ID</param>
     private void MyInstantiate(GameObject game, Vector3 pos, int id, float energy)
     {
-        //var useEnergy = game.GetComponent(typeof(IUnit)) as IUnit;
-        //if (!main.IsUseEnergy(useEnergy.unitEnergy, id, energy)) return;
         GameObject gameObject /*= Instantiate(game, pos, Quaternion.identity)*/;
         if (IsSameId(id, PhotonNetwork.player.ID)) gameObject = Instantiate(game, pos, Quaternion.identity);
         else gameObject = Instantiate(game, new Vector3(-pos.x, pos.y, -pos.z), Quaternion.identity);

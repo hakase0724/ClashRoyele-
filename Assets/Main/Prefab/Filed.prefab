@@ -135,8 +135,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefab:
-  - {fileID: 1690591512199924, guid: 982a4f4dc02ed1545aa203967484d788, type: 2}
-  - {fileID: 1944564386018634, guid: 6ee46ffdb82c7d94b9fb425cf223fef0, type: 2}
-  - {fileID: 1932291717010252, guid: d22b37706a3ccdb4bb46639cd05f033b, type: 2}
-  - {fileID: 1323787464875026, guid: 2a9d72ce8594a814a85d471b9ccd4630, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   instantiateZone: {fileID: 0}

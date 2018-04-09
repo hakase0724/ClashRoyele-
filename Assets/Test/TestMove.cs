@@ -122,6 +122,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
 
     public void Attack(float attack, GameObject attackTarget)
     {
+        Debug.Log("攻撃");
         const int attackInterval = 1;
         var a = attackTarget.GetComponent(typeof(IUnit)) as IUnit;
         Observable.Interval(TimeSpan.FromSeconds(attackInterval))
@@ -165,6 +166,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     public void Damage(float damage)
     {
         unitHp.Value -= damage;
+        Debug.Log("ダメージを受けた" + unitHp.Value);
     }
 
     public void Death()
@@ -178,14 +180,21 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     /// <param name="target">対象</param>
     private void TargetLockOn(GameObject target)
     {
-        if (CalcDistance(transform.position, target.transform.position) > targetDistance * targetDistance) return;
+        Debug.Log("ターゲットロックオン");
+        if (CalcDistance(transform.position, target.transform.position) > targetDistance * targetDistance)
+        {
+            Debug.Log("ロックオン範囲にいない");
+            return;
+        }
         if (targetQueue.Count <= 0)
         {
+            Debug.Log("ターゲットへ向かう");
             GoToTarget(target);
             targetQueue.Enqueue(target);
         }
         else
         {
+            Debug.Log("ターゲットを記憶");
             targetQueue.Enqueue(target);
         }
     }
@@ -196,12 +205,14 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     /// <param name="target">対象</param>
     private void GoToTarget(GameObject target)
     {
+        Debug.Log("ターゲットへ向かう");
         if (nav.pathStatus != NavMeshPathStatus.PathInvalid) nav.destination = target.transform.position;
         Attack(attackPower, target);
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log("トリガーオン");
         var otherUnit = other.GetComponent(typeof(IUnit)) as IUnit;
         if (otherUnit == null) return;
         //同一生成者なら無視する

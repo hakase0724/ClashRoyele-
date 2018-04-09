@@ -46,9 +46,6 @@ public class Main : Photon.MonoBehaviour
             //現在のenergyの値を10分の１にしてゲージに反映させる
             .Subscribe(x => slider.value = x / 10);
 
-        this.UpdateAsObservable()
-            .Subscribe(_ => Debug.Log(enemyCount.Value));
-
         enemyCount
             .Buffer(2,1)
             .Select(x => x.Last())
