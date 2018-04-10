@@ -93,8 +93,8 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     {
         nav.enabled = true;       
         //自分が味方か敵かで対象を変える
-        if (isMine.Value) TargetPosSet(targetGet.mArray);
-        else TargetPosSet(targetGet.eArray);
+        if (isMine.Value) targets.AddRange(targetGet.mArray);
+        else targets.AddRange(targetGet.eArray);
         LeftOrRight();            
         //目的地に近づいたときに減速しないようにする
         nav.autoBraking = false;
@@ -119,7 +119,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         //対応するオブジェクトと同期をする　
         //現在は3秒に一回同期している 
         //マスタークライアントのみ送信する
-        Observable.Interval(TimeSpan.FromSeconds(3))
+        Observable.Interval(TimeSpan.FromSeconds(2))
             .Where(_=> PhotonNetwork.isMasterClient)
             .Subscribe(_ => RaiseEvent())
             .AddTo(gameObject);

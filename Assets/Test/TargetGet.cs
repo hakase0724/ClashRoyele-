@@ -10,37 +10,26 @@ public class TargetGet : MonoBehaviour
     private GameObject[] mineArray = new GameObject[3];
     [SerializeField]
     private GameObject[] enemyArray = new GameObject[3];
-    public GameObject[] mArray { get { return mineArray; } }
-    public GameObject[] eArray { get { return enemyArray; } }
-    //public List<Vector3> mine { get; private set; } = new List<Vector3>();
-    //public List<Vector3> enemys { get; private set; } = new List<Vector3>();
+    public Vector3[] mArray {get{ return minePos; }}
+    public Vector3[] eArray { get { return enemyPos; }}
 
-    //private void Start()
-    //{
-    //    //this.UpdateAsObservable()
-    //    //    .Where(_ => Input.GetKeyDown(KeyCode.M))
-    //    //    .Subscribe(_ =>
-    //    //    {
-    //    //        foreach (var m in mine)
-    //    //        {
-    //    //            Debug.Log(m);
-    //    //        }
-    //    //    });
+    private Vector3[] minePos = new Vector3[3];
+    private Vector3[] enemyPos = new Vector3[3];
 
-    //    //this.UpdateAsObservable()
-    //    //   .Where(_ => Input.GetKeyDown(KeyCode.E))
-    //    //   .Subscribe(_ =>
-    //    //   {
-    //    //       foreach (var m in enemys)
-    //    //       {
-    //    //           Debug.Log(m);
-    //    //       }
-    //    //   });
-    //}
+    private void Awake()
+    {
+        minePos = PickPos(mineArray);
+        enemyPos = PickPos(enemyArray);
+    }
 
-    //public void Enter(GameObject obj,bool isMine)
-    //{
-    //    if (!isMine) mine.Add(obj.transform.position);
-    //    else enemys.Add(obj.transform.position);
-    //}
+    private Vector3[] PickPos(GameObject[] game)
+    {
+        Vector3[] posArray = new Vector3[game.Length];
+        for (int i = 0; i < game.Length; i++)
+        {
+            posArray[i] = game[i].transform.position;
+        }
+        return posArray;
+    }
+  
 }
