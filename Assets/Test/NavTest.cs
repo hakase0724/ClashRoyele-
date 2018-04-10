@@ -14,9 +14,9 @@ public class NavTest : Photon.MonoBehaviour
     //private ReactiveProperty<GameObject> target = new ReactiveProperty<GameObject>();
     //private List<GameObject> targets = new List<GameObject>();
     private NavMeshAgent nav => GetComponent<NavMeshAgent>();
-    private void Awake()
+    private void OnEnable()
     {
-        if (!photonView.isMine) transform.position = new Vector3(-transform.position.x, transform.position.y, -transform.position.z);
+        if (!photonView.isMine) nav.Warp(-transform.position);
     }
 	// Use this for initialization
 	void Start ()
