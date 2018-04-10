@@ -118,7 +118,30 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     private void RaiseEvent()
     {
         myData.DataSet(transform.position, unitHp.Value,animBool);
-        PhotonNetwork.RaiseEvent(unitId, myData, true, null);
+        Debug.Log("イベント発生");
+        object[] content = new object[3];
+        content[0] = myData.myPos;
+        content[1] = myData.myHp;
+        content[2] = myData.animBool;
+        PhotonNetwork.RaiseEvent(unitId, content, true, null);
+        Debug.Log("イベント発生通知完了");
+    }
+
+    /// <summary>
+    /// PUNのRaiseEventのdelegateに登録する関数
+    /// </summary>
+    /// <param name="evId">識別番号</param>
+    /// <param name="content">通信の中身</param>
+    /// <param name="senderId">送ってきた相手の番号</param>
+    private void OnEvent(byte evId, object content, int senderId)
+    {
+        if (PhotonNetwork.isMasterClient) return;
+        if (unitId != evId) return;
+        Debug.Log("受信データ：" + content);
+        //var data = (MyData)content;
+        //nav.Warp(-data.myPos);
+        //unitHp.Value = data.myHp;
+        //anim.SetBool("Attack", data.animBool);
     }
 
     /// <summary>
@@ -146,22 +169,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         if (left > right) targets.Reverse();
     }
 
-    /// <summary>
-    /// PUNのRaiseEventのdelegateに登録する関数
-    /// </summary>
-    /// <param name="evId">識別番号</param>
-    /// <param name="content">通信の中身</param>
-    /// <param name="senderId">送ってきた相手の番号</param>
-    private void OnEvent(byte evId, object content, int senderId)
-    {
-        if (PhotonNetwork.isMasterClient) return;      
-        if (unitId != evId) return;
-        Debug.Log("受信データ：" + content);
-        var data = (MyData)content;
-        nav.Warp(-data.myPos);
-        unitHp.Value = data.myHp;
-        anim.SetBool("Attack", data.animBool);
-    }
+    
 
 
     public void Move()
