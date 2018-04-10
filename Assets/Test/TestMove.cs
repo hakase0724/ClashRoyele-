@@ -24,6 +24,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     private Animator anim => GetComponent<Animator>();
     private Rigidbody rb => GetComponent<Rigidbody>();
     private Queue<GameObject> targetQueue = new Queue<GameObject>();
+    //向かう場所左→右の順で格納している
     private List<Vector3> targets = new List<Vector3>();
     
     [SerializeField]
@@ -84,16 +85,20 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     /// </summary>
     private void LeftOrRight()
     {
+        //左の最初の点
         float left = CalcDistance(transform.position, targets.First());
+        //右の最初の点
         float right = CalcDistance(transform.position, targets.Last());
+        //右のほうが近ければリストの中身を反転させる
         if (left > right) targets.Reverse();
     }
 
     private void OnEvent(byte evId, object content, int senderId)
-    {      
+    {
+        if (PhotonNetwork.isMasterClient) return;      
         if (unitId != evId) return;
         var pos = (Vector3)content;
-        if (CalcDistance(transform.position, pos) <= 10f) return;
+        if (CalcDistance(transform.position, pos) <= 5f) return;
         nav.Warp(-pos);
     }
 
@@ -104,7 +109,6 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         if (targetPointa >= targets.Count) return;
         if (targets[targetPointa] == null)
         {
-            nav.Stop();
             anim.SetBool("Attack", true);
             return;
         }
