@@ -116,7 +116,9 @@ public class TestMove : Photon.MonoBehaviour,IUnit
             .Subscribe(x => Death())
             .AddTo(gameObject);
 
-        //対応するオブジェクトと同期をする　現在は3秒に一回同期している
+        //対応するオブジェクトと同期をする　
+        //現在は3秒に一回同期している 
+        //マスタークライアントのみ送信する
         Observable.Interval(TimeSpan.FromSeconds(3))
             .Where(_=> PhotonNetwork.isMasterClient)
             .Subscribe(_ => RaiseEvent())
@@ -136,6 +138,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         content[1] = myData.myHp;
         content[2] = myData.animBool;
         PhotonNetwork.RaiseEvent(unitId, content, true, null);
+        Debug.Log("データ送信");
     }
 
     /// <summary>
@@ -155,9 +158,21 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         //変換した配列の中身をMyData型に変換
         var data = new MyData((Vector3)obj[0], (float)obj[1], (bool)obj[2]);
         //受け取ったデータを元に自分の情報を更新する
-        if(CalcDistance(transform.position,-data.myPos) >= 5f) nav.Warp(-data.myPos);
+        if(CalcDistance(transform.position,-data.myPos) >= 2f) nav.Warp(-data.myPos);
         if(unitHp.Value != data.myHp) unitHp.Value = data.myHp;
-        if(animBool != data.animBool) anim.SetBool("Attack", data.animBool);
+        if (animBool != data.animBool) AnimChange("Attack", data.animBool);
+    }
+
+    /// <summary>
+    /// アニメーションを切り替えてNavMeshAgentのspeedを更新する
+    /// </summary>
+    /// <param name="animName">アニメーション名</param>
+    /// <param name="animBool">アニメーションのオンオフ</param>
+    private void AnimChange(string animName,bool animBool)
+    {
+        anim.SetBool(animName,animBool);
+        if (animBool) nav.speed = 0f;
+        else nav.speed = unitSpeed;
     }
 
     /// <summary>
@@ -185,9 +200,6 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         if (left > right) targets.Reverse();
     }
 
-    
-
-
     public void Move()
     {
         if (targets.Count <= 0) return;
@@ -195,7 +207,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         if (targets[targetPointa] == null)
         {
             animBool = true;
-            anim.SetBool("Attack", animBool);
+            AnimChange("Attack",animBool);
             return;
         }
         if (!anim.enabled) anim.enabled = true;
@@ -247,8 +259,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     {
         target.Damage(attack);
         animBool = true;
-        anim.SetBool("Attack", animBool);
-        nav.speed = 0f;
+        AnimChange("Attack", animBool);
     }
 
     /// <summary>
@@ -266,8 +277,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
                 nav.destination = targets[targetPointa];
             }
             animBool = false;
-            anim.SetBool("Attack", animBool);
-            nav.speed = unitSpeed;
+            AnimChange("Attack", animBool);
         }    
     }
 
