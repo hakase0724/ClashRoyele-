@@ -37,6 +37,10 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     [SerializeField, Tooltip("ユニットの移動速度")]
     private float _UnitSpeed;
 
+    private void Awake()
+    {
+        PhotonNetwork.OnEventCall += this.OnEvent;
+    }
     private void OnEnable()
     {
         nav.enabled = false;
@@ -69,6 +73,10 @@ public class TestMove : Photon.MonoBehaviour,IUnit
             .Where(x => x <= 0)
             .Subscribe(x => Death())
             .AddTo(gameObject);
+
+        Observable.Interval(TimeSpan.FromSeconds(10))
+            .Subscribe(_ => PhotonNetwork.RaiseEvent(unitId, transform.position, true, null))
+            .AddTo(gameObject);
     }
 
     /// <summary>
@@ -80,7 +88,15 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         float right = CalcDistance(transform.position, targets.Last());
         if (left > right) targets.Reverse();
     }
-    
+
+    private void OnEvent(byte evId, object content, int senderId)
+    {      
+        if (unitId != evId) return;
+        var pos = (Vector3)content;
+        if (CalcDistance(transform.position, pos) <= 10f) return;
+        nav.Warp(-pos);
+    }
+
 
     public void Move()
     {
