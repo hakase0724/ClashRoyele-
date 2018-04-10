@@ -111,7 +111,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
 
         //対応するオブジェクトと同期をする　現在は3秒に一回同期している
         Observable.Interval(TimeSpan.FromSeconds(3))
-            .Subscribe(_ => PhotonNetwork.RaiseEvent(unitId, transform.position, true, null))
+            .Subscribe(_ => RaiseEvent())
             .AddTo(gameObject);
     }
 
@@ -156,6 +156,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     {
         if (PhotonNetwork.isMasterClient) return;      
         if (unitId != evId) return;
+        Debug.Log("受信データ：" + content);
         var data = (MyData)content;
         nav.Warp(-data.myPos);
         unitHp.Value = data.myHp;
