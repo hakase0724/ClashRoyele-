@@ -2249,9 +2249,9 @@ MonoBehaviour:
   - {fileID: 1006094897}
   - {fileID: 399613212}
   enemyArray:
-  - {fileID: 214601852}
-  - {fileID: 309099869}
   - {fileID: 1386258358}
+  - {fileID: 309099869}
+  - {fileID: 214601852}
 --- !u!1 &2021747909
 GameObject:
   m_ObjectHideFlags: 0

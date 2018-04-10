@@ -51,9 +51,9 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         nav.enabled = true;
         unitHp.Value = _UnitHp;
         //自分が味方か敵かで対象を変える
-        if (isMine.Value) targets.AddRange(targetGet.mine);
-        else targets.AddRange(targetGet.enemys);
-        LeftOrRight();       
+        if (isMine.Value) TargetPosSet(targetGet.mArray);
+        else TargetPosSet(targetGet.eArray);
+        //LeftOrRight();       
         unitSpeed = _UnitSpeed;
         //目的地に近づいたときに減速しないようにする
         nav.autoBraking = false;
@@ -78,6 +78,14 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         Observable.Interval(TimeSpan.FromSeconds(10))
             .Subscribe(_ => PhotonNetwork.RaiseEvent(unitId, transform.position, true, null))
             .AddTo(gameObject);
+    }
+
+    private void TargetPosSet(GameObject[] targetObjects)
+    {
+        foreach (var p in targetObjects)
+        {
+            targets.Add(p.transform.position);
+        }
     }
 
     /// <summary>

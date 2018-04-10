@@ -90,7 +90,7 @@ public class TestTarget :Photon.MonoBehaviour,IBuilding,IUnit
     // Use this for initialization
     void Start () {
 
-        Camera.main.GetComponent<TargetGet>().Enter(gameObject, isMine.Value);
+        //Camera.main.GetComponent<TargetGet>().Enter(gameObject, isMine.Value);
 
         unitHp
             .Where(x => x <= 0)
