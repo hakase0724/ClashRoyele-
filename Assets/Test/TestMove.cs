@@ -18,7 +18,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     {
         public Vector3 myPos;
         public float myHp;
-        public bool animBool;
+        public bool animBool = false;
 
         public MyData(Vector3 pos,float hp)
         {
@@ -40,6 +40,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         }
     }
     private MyData myData;
+    //アニメーションのbool値
     private bool animBool = false;
     public BoolReactiveProperty isMine { get; set; } = new BoolReactiveProperty();
     public FloatReactiveProperty unitHp { get; set; } = new FloatReactiveProperty();
@@ -48,11 +49,12 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     public float maxUnitHp { get {return _UnitHp; } }
     public byte unitId { get; set; }
 
+    //対象を格納している配列のポインタ
     private int targetPointa = 0;
     private TargetGet targetGet => Camera.main.GetComponent<TargetGet>();
     private NavMeshAgent nav => GetComponent<NavMeshAgent>();
     private Animator anim => GetComponent<Animator>();
-    private Rigidbody rb => GetComponent<Rigidbody>();
+    //攻撃対象を格納する
     private Queue<GameObject> targetQueue = new Queue<GameObject>();
     //向かう場所左→右の順で格納している
     private List<Vector3> targets = new List<Vector3>();
@@ -75,17 +77,18 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     }
     private void OnEnable()
     {
+        //生成位置によって瞬間移動するのを防ぐ　詳しい原因は不明暫定対応　要調査
         nav.enabled = false;
+        unitSpeed = _UnitSpeed;
+        unitHp.Value = _UnitHp;
     }
     private  void Start()
     {
-        nav.enabled = true;
-        unitHp.Value = _UnitHp;
+        nav.enabled = true;       
         //自分が味方か敵かで対象を変える
         if (isMine.Value) TargetPosSet(targetGet.mArray);
         else TargetPosSet(targetGet.eArray);
-        LeftOrRight();       
-        unitSpeed = _UnitSpeed;
+        LeftOrRight();            
         //目的地に近づいたときに減速しないようにする
         nav.autoBraking = false;
 
@@ -106,6 +109,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
             .Subscribe(x => Death())
             .AddTo(gameObject);
 
+        //対応するオブジェクトと同期をする　現在は3秒に一回同期している
         Observable.Interval(TimeSpan.FromSeconds(3))
             .Subscribe(_ => PhotonNetwork.RaiseEvent(unitId, transform.position, true, null))
             .AddTo(gameObject);
@@ -117,6 +121,10 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         PhotonNetwork.RaiseEvent(unitId, myData, true, null);
     }
 
+    /// <summary>
+    /// 対象のGameObject型配列からVector3型リストを作成する
+    /// </summary>
+    /// <param name="targetObjects">対象のGameObject型配列</param>
     private void TargetPosSet(GameObject[] targetObjects)
     {
         foreach (var p in targetObjects)
@@ -138,6 +146,12 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         if (left > right) targets.Reverse();
     }
 
+    /// <summary>
+    /// PUNのRaiseEventのdelegateに登録する関数
+    /// </summary>
+    /// <param name="evId">識別番号</param>
+    /// <param name="content">通信の中身</param>
+    /// <param name="senderId">送ってきた相手の番号</param>
     private void OnEvent(byte evId, object content, int senderId)
     {
         if (PhotonNetwork.isMasterClient) return;      
@@ -190,7 +204,6 @@ public class TestMove : Photon.MonoBehaviour,IUnit
 
     public void Attack(float attack, GameObject attackTarget)
     {
-        Debug.Log("攻撃");
         const int attackInterval = 1;
         var a = attackTarget.GetComponent(typeof(IUnit)) as IUnit;
         Observable.Interval(TimeSpan.FromSeconds(attackInterval))
@@ -230,14 +243,12 @@ public class TestMove : Photon.MonoBehaviour,IUnit
             animBool = false;
             anim.SetBool("Attack", animBool);
             nav.speed = unitSpeed;
-        }
-       
+        }    
     }
 
     public void Damage(float damage)
     {
         unitHp.Value -= damage;
-        Debug.Log("ダメージを受けた" + unitHp.Value);
     }
 
     public void Death()
@@ -251,21 +262,14 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     /// <param name="target">対象</param>
     private void TargetLockOn(GameObject target)
     {
-        Debug.Log("ターゲットロックオン");
-        if (CalcDistance(transform.position, target.transform.position) > targetDistance * targetDistance)
-        {
-            Debug.Log("ロックオン範囲にいない");
-            return;
-        }
+        if (CalcDistance(transform.position, target.transform.position) > targetDistance * targetDistance) return;
         if (targetQueue.Count <= 0)
         {
-            Debug.Log("ターゲットへ向かう");
             GoToTarget(target);
             targetQueue.Enqueue(target);
         }
         else
         {
-            Debug.Log("ターゲットを記憶");
             targetQueue.Enqueue(target);
         }
     }
@@ -276,14 +280,13 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     /// <param name="target">対象</param>
     private void GoToTarget(GameObject target)
     {
-        Debug.Log("ターゲットへ向かう");
+        if (target == null) return;
         if (nav.pathStatus != NavMeshPathStatus.PathInvalid) nav.destination = target.transform.position;
         Attack(attackPower, target);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("トリガーオン");
         var otherUnit = other.GetComponent(typeof(IUnit)) as IUnit;
         if (otherUnit == null) return;
         //同一生成者なら無視する
