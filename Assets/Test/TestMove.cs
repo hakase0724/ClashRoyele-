@@ -65,7 +65,8 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     private Queue<GameObject> targetQueue = new Queue<GameObject>();
     //向かう場所左→右の順で格納している
     private List<Vector3> targets = new List<Vector3>();
-    
+    private bool isAlive = true;
+
     [SerializeField]
     private float _UnitHp;
     [SerializeField, Tooltip("自分と相手のときそれぞれの色")]
@@ -157,8 +158,39 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         object[] obj = (object[])content;
         //変換した配列の中身をMyData型に変換
         var data = new MyData((Vector3)obj[0], (float)obj[1], (bool)obj[2]);
+        //Nullチェック
+        if (!isAlive)
+        {
+            Debug.Log("生死フラグに引っかかった");
+            return;
+        }
+        if(gameObject == null)
+        {
+            Debug.Log("gameObjectのNullチェックに引っかかった");
+            return;
+        }
+        if (transform.position == null)
+        {
+            Debug.Log("transformのNullチェックに引っかかった");
+            return;
+        }
+        if(data == null)
+        {
+            Debug.Log("dataのNullチェックに引っかかった");
+            return;
+        }
+        if (data.myPos == null)
+        {
+            Debug.Log("data.myPosのNullチェックに引っかかった");
+            return;
+        }
+        if (nav == null)
+        {
+            Debug.Log("navのNullチェックに引っかかった");
+            return;
+        }
         //受け取ったデータを元に自分の情報を更新する
-        if(CalcDistance(transform.position,-data.myPos) >= 2f) nav.Warp(-data.myPos);
+        if (CalcDistance(transform.position,-data.myPos) >= 2f) nav.Warp(-data.myPos);
         if(unitHp.Value != data.myHp) unitHp.Value = data.myHp;
         if (animBool != data.animBool) AnimChange("Attack", data.animBool);
     }
@@ -288,6 +320,15 @@ public class TestMove : Photon.MonoBehaviour,IUnit
 
     public void Death()
     {
+        if(PhotonNetwork.isMasterClient)photonView.RPC("DeathSync", PhotonTargets.Others, unitId);
+        Destroy(gameObject);
+        isAlive = false;
+    }
+
+    [PunRPC]
+    public void DeathSync(int id)
+    {
+        if (id != unitId) return;
         Destroy(gameObject);
     }
 
