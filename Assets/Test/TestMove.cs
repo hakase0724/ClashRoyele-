@@ -11,6 +11,36 @@ using static StaticUse;
 
 public class TestMove : Photon.MonoBehaviour,IUnit
 {
+    /// <summary>
+    /// ユニットの情報を格納
+    /// </summary>
+    public class MyData
+    {
+        public Vector3 myPos;
+        public float myHp;
+        public bool animBool;
+
+        public MyData(Vector3 pos,float hp)
+        {
+            myPos = pos;
+            myHp = hp;
+        }
+
+        public void DataSet(Vector3 pos, float hp)
+        {
+            myPos = pos;
+            myHp = hp;
+        }
+
+        public void DataSet(Vector3 pos, float hp,bool animBool)
+        {
+            myPos = pos;
+            myHp = hp;
+            this.animBool = animBool;
+        }
+    }
+    private MyData myData;
+    private bool animBool = false;
     public BoolReactiveProperty isMine { get; set; } = new BoolReactiveProperty();
     public FloatReactiveProperty unitHp { get; set; } = new FloatReactiveProperty();
     public float unitEnergy { get; set; } = 1;
@@ -41,6 +71,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     private void Awake()
     {
         PhotonNetwork.OnEventCall += this.OnEvent;
+        myData = new MyData(transform.position, _UnitHp);
     }
     private void OnEnable()
     {
@@ -53,7 +84,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         //自分が味方か敵かで対象を変える
         if (isMine.Value) TargetPosSet(targetGet.mArray);
         else TargetPosSet(targetGet.eArray);
-        //LeftOrRight();       
+        LeftOrRight();       
         unitSpeed = _UnitSpeed;
         //目的地に近づいたときに減速しないようにする
         nav.autoBraking = false;
@@ -75,9 +106,15 @@ public class TestMove : Photon.MonoBehaviour,IUnit
             .Subscribe(x => Death())
             .AddTo(gameObject);
 
-        Observable.Interval(TimeSpan.FromSeconds(10))
+        Observable.Interval(TimeSpan.FromSeconds(3))
             .Subscribe(_ => PhotonNetwork.RaiseEvent(unitId, transform.position, true, null))
             .AddTo(gameObject);
+    }
+
+    private void RaiseEvent()
+    {
+        myData.DataSet(transform.position, unitHp.Value,animBool);
+        PhotonNetwork.RaiseEvent(unitId, myData, true, null);
     }
 
     private void TargetPosSet(GameObject[] targetObjects)
@@ -105,9 +142,10 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     {
         if (PhotonNetwork.isMasterClient) return;      
         if (unitId != evId) return;
-        var pos = (Vector3)content;
-        if (CalcDistance(transform.position, pos) <= 5f) return;
-        nav.Warp(-pos);
+        var data = (MyData)content;
+        nav.Warp(-data.myPos);
+        unitHp.Value = data.myHp;
+        anim.SetBool("Attack", data.animBool);
     }
 
 
@@ -117,7 +155,8 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         if (targetPointa >= targets.Count) return;
         if (targets[targetPointa] == null)
         {
-            anim.SetBool("Attack", true);
+            animBool = true;
+            anim.SetBool("Attack", animBool);
             return;
         }
         if (!anim.enabled) anim.enabled = true;
@@ -156,6 +195,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         var a = attackTarget.GetComponent(typeof(IUnit)) as IUnit;
         Observable.Interval(TimeSpan.FromSeconds(attackInterval))
             .TakeUntilDestroy(attackTarget)
+            .Do(_=>Debug.Log(attackTarget))
             .Subscribe(_ => Attack(attack,a),() => Comp())
             .AddTo(gameObject);
     }
@@ -168,7 +208,8 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     private void Attack(float attack, IUnit target)
     {
         target.Damage(attack);
-        anim.SetBool("Attack", true);
+        animBool = true;
+        anim.SetBool("Attack", animBool);
         nav.speed = 0f;
     }
 
@@ -186,7 +227,8 @@ public class TestMove : Photon.MonoBehaviour,IUnit
             {
                 nav.destination = targets[targetPointa];
             }
-            anim.SetBool("Attack", false);
+            animBool = false;
+            anim.SetBool("Attack", animBool);
             nav.speed = unitSpeed;
         }
        
@@ -248,20 +290,6 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         if (otherUnit.isMine.Value == isMine.Value) return;
         TargetLockOn(other.gameObject);
         nav.speed = 0f;
-    }
-    /// <summary>
-    /// 位置と体力を同期する
-    /// マスタークライアントが基準
-    /// </summary>
-    /// <param name="pos">同期する位置</param>
-    /// <param name="nowHp">同期する体力</param>
-    [PunRPC]
-    public void Sync(Vector3 pos,float nowHp)
-    {
-        if (PhotonNetwork.isMasterClient) return;
-        if (CalcDistance(transform.position, pos) <= 10) return;
-        nav.Warp(new Vector3(-pos.x,pos.y,-pos.z));
-        unitHp.Value = nowHp;
     }
 }
 
