@@ -20,6 +20,13 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         public float myHp;
         public bool animBool = false;
 
+        public MyData(Vector3 pos,float hp,bool animBool)
+        {
+            myPos = pos;
+            myHp = hp;
+            this.animBool = animBool;
+        }
+
         public MyData(Vector3 pos,float hp)
         {
             myPos = pos;
@@ -111,20 +118,24 @@ public class TestMove : Photon.MonoBehaviour,IUnit
 
         //対応するオブジェクトと同期をする　現在は3秒に一回同期している
         Observable.Interval(TimeSpan.FromSeconds(3))
+            .Where(_=> PhotonNetwork.isMasterClient)
             .Subscribe(_ => RaiseEvent())
             .AddTo(gameObject);
     }
 
+    /// <summary>
+    /// 同期するために必要なデータを送る
+    /// </summary>
     private void RaiseEvent()
     {
+        //myDataにデータをセット
         myData.DataSet(transform.position, unitHp.Value,animBool);
-        Debug.Log("イベント発生");
+        //データを送るため送るデータをobject型の配列に格納
         object[] content = new object[3];
         content[0] = myData.myPos;
         content[1] = myData.myHp;
         content[2] = myData.animBool;
         PhotonNetwork.RaiseEvent(unitId, content, true, null);
-        Debug.Log("イベント発生通知完了");
     }
 
     /// <summary>
@@ -135,13 +146,18 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     /// <param name="senderId">送ってきた相手の番号</param>
     private void OnEvent(byte evId, object content, int senderId)
     {
+        //マスタークライアントであれば何もしない
         if (PhotonNetwork.isMasterClient) return;
+        //受け取ったIDが自分のものと異なれば違うオブジェクトとして何もしない
         if (unitId != evId) return;
-        Debug.Log("受信データ：" + content);
-        //var data = (MyData)content;
-        //nav.Warp(-data.myPos);
-        //unitHp.Value = data.myHp;
-        //anim.SetBool("Attack", data.animBool);
+        //受け取ったデータをobject型の配列に変換
+        object[] obj = (object[])content;
+        //変換した配列の中身をMyData型に変換
+        var data = new MyData((Vector3)obj[0], (float)obj[1], (bool)obj[2]);
+        //受け取ったデータを元に自分の情報を更新する
+        if(CalcDistance(transform.position,-data.myPos) >= 5f) nav.Warp(-data.myPos);
+        if(unitHp.Value != data.myHp) unitHp.Value = data.myHp;
+        if(animBool != data.animBool) anim.SetBool("Attack", data.animBool);
     }
 
     /// <summary>
