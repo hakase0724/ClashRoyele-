@@ -8,6 +8,7 @@ public class InstantiateData :Photon.MonoBehaviour
 {
     private int _prefabNumber;
     private Main main => GetComponent<Main>();
+    private byte unitId = 0;
 
     [SerializeField]
     private GameObject[] prefabs = new GameObject[0];
@@ -74,6 +75,8 @@ public class InstantiateData :Photon.MonoBehaviour
         if (IsSameId(id, PhotonNetwork.player.ID)) gameObject = Instantiate(game, pos, Quaternion.identity);
         else gameObject = Instantiate(game, new Vector3(-pos.x, pos.y, -pos.z), Quaternion.identity);
         var unit = gameObject.GetComponent(typeof(IUnit)) as IUnit;
+        unit.unitId = unitId;
+        unitId++;
         unit.MyColor(id);
     }
 }

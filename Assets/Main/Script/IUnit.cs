@@ -11,6 +11,7 @@ public interface IUnit
     BoolReactiveProperty isMine { get; set; }
     //ユニットの体力
     FloatReactiveProperty unitHp { get;set;}
+    byte unitId { get; set; }
     float unitSpeed { get; set; }
     //ユニット生成時のコスト
     float unitEnergy { get; set; }

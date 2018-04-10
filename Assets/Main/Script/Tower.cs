@@ -27,6 +27,19 @@ public class Tower : MonoBehaviour, IBuilding, IUnit
         }
     }
 
+    public byte unitId
+    {
+        get
+        {
+            throw new NotImplementedException();
+        }
+
+        set
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     [SerializeField]
     private Color[] color = new Color[0];
 

@@ -16,6 +16,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     public float unitEnergy { get; set; } = 1;
     public float unitSpeed { get; set; }
     public float maxUnitHp { get {return _UnitHp; } }
+    public byte unitId { get; set; }
 
     private int targetPointa = 0;
     private TargetGet targetGet => Camera.main.GetComponent<TargetGet>();

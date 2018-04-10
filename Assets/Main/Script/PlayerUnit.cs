@@ -62,6 +62,19 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
         }
     }
 
+    public byte unitId
+    {
+        get
+        {
+            throw new NotImplementedException();
+        }
+
+        set
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     [SerializeField,Tooltip("自分と相手のときそれぞれの色")]
     private Color[] color = new Color[0];
     [SerializeField,Tooltip("ユニットの体力")]

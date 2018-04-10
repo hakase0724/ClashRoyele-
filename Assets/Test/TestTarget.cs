@@ -31,6 +31,19 @@ public class TestTarget :Photon.MonoBehaviour,IBuilding,IUnit
 
     public float unitSpeed { get; set; }
 
+    public byte unitId
+    {
+        get
+        {
+            throw new NotImplementedException();
+        }
+
+        set
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public void Attack(float attack, GameObject attackTarget)
     {
         

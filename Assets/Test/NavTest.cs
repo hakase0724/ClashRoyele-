@@ -41,7 +41,9 @@ public class NavTest : Photon.MonoBehaviour
 
     private void OnEvent(byte evCode, object content,int senderId)
     {
-        if (myCode == evCode) Debug.Log("受信：" + content);
+        var pos = (Vector3)content;
+        if (myCode == evCode) Debug.Log("受信：" + pos);
+        nav.Warp(-pos);
     }
 
     //private List<float> CalcDistance()
