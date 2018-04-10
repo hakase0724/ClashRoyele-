@@ -58,6 +58,10 @@ public class MoveTest : MonoBehaviour,IUnit
 
         Observable.Interval(System.TimeSpan.FromSeconds(3))
             .Subscribe(_ => PhotonNetwork.RaiseEvent(myCode, transform.position, true, null));
+
+        this.UpdateAsObservable()
+            .Where(_ => Input.GetKeyDown(KeyCode.S))
+            .Subscribe(_ => PhotonNetwork.RaiseEvent(myCode, transform.position, true, null));
 	}
 
     private void OnEvent(byte evCode, Vector3 content)

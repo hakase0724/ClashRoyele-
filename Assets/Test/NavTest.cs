@@ -14,6 +14,11 @@ public class NavTest : Photon.MonoBehaviour
     //private ReactiveProperty<GameObject> target = new ReactiveProperty<GameObject>();
     //private List<GameObject> targets = new List<GameObject>();
     private NavMeshAgent nav => GetComponent<NavMeshAgent>();
+    private byte myCode = 0;
+    private void Awake()
+    {
+        PhotonNetwork.OnEventCall += this.OnEvent;
+    }
     private void OnEnable()
     {
         if (!photonView.isMine) nav.Warp(-transform.position);
@@ -23,19 +28,20 @@ public class NavTest : Photon.MonoBehaviour
     {
         target = GameObject.FindGameObjectWithTag("Enemy");
         nav.SetDestination(target.transform.position);
-        //var maneger = GameObject.FindGameObjectWithTag("Main").GetComponent<TestManeger>();
-        //targets = maneger.objects;
-        //target.Value = SearchMinDistance(CalcDistance());
-        //target
-        //    .Subscribe(x => nav.SetDestination(x.transform.position));
 
-        //this.UpdateAsObservable()
-        //    .Where(_ => target.Value == null)
-        //    .Subscribe(_ => target.Value = SearchMinDistance(CalcDistance()));
+        this.UpdateAsObservable()
+           .Where(_ => Input.GetKeyDown(KeyCode.S))
+           .Subscribe(_ => PhotonNetwork.RaiseEvent(myCode, transform.position, true, null));
+    }
 
-        //this.UpdateAsObservable()
-        //    .Where(_ => Input.GetKeyDown(KeyCode.T))
-        //    .Subscribe(_ => Debug.Log(target.Value));      
+    private void OnEvent(byte evCode, Vector3 content)
+    {
+        if (myCode == evCode) Debug.Log("受信：" + content);
+    }
+
+    private void OnEvent(byte evCode, object content,int senderId)
+    {
+        if (myCode == evCode) Debug.Log("受信：" + content);
     }
 
     //private List<float> CalcDistance()
