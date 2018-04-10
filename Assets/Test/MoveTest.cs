@@ -27,6 +27,7 @@ public class MoveTest : MonoBehaviour,IUnit
     private List<RootStetas> wayPoints = new List<RootStetas>();
     private TestManeger maneger => GameObject.FindGameObjectWithTag("Main").GetComponent<TestManeger>();
     private IntReactiveProperty targetPointa = new IntReactiveProperty(0);
+    private byte myCode = 0;
 
     private void Awake()
     {
@@ -54,7 +55,15 @@ public class MoveTest : MonoBehaviour,IUnit
             .Where(_ => CalcDistance(transform.position, wayPoints[targetPointa.Value].rootObject.transform.position) <= 0.5f)
             .Subscribe(_ => targetPointa.Value++)
             .AddTo(gameObject);
+
+        Observable.Interval(System.TimeSpan.FromSeconds(3))
+            .Subscribe(_ => PhotonNetwork.RaiseEvent(myCode, transform.position, true, null));
 	}
+
+    private void OnEvent(byte evCode, Vector3 content)
+    {
+        if (myCode == evCode) Debug.Log("受信：" + content);
+    }
 
     public void MyColor(int id)
     {
