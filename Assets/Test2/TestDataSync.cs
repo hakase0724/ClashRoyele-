@@ -17,12 +17,6 @@ public class TestDataSync :Photon.MonoBehaviour
             syncPos.Add(t.transform.position);
         }
 	}
-	
-	// Update is called once per frame
-	void Update ()
-    {
-		
-	}
 
     void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
