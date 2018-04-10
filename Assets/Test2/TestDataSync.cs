@@ -22,21 +22,22 @@ public class TestDataSync :Photon.MonoBehaviour
     {
         if (stream.isWriting)
         {
+            var sendPos = syncPos.ToArray();
             //データの送信
-            stream.SendNext(syncPos);
-            foreach(var p in syncPos)
+            stream.SendNext(sendPos);
+            foreach(var p in sendPos)
             {
-                Debug.Log("送信：" + syncPos);
+                Debug.Log("送信：" + p);
             }
            
         }
         else
         {
             //データの受信
-            this.syncPos = (List<Vector3>)stream.ReceiveNext();
-            foreach (var p in syncPos)
+            var receivePos = (Vector3[])stream.ReceiveNext();
+            foreach (var p in receivePos)
             {
-                Debug.Log("受信：" + syncPos);
+                Debug.Log("受信：" + p);
             }
         }
     }
