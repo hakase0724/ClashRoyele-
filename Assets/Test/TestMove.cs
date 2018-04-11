@@ -315,11 +315,13 @@ public class TestMove : Photon.MonoBehaviour, IUnit
 
     public void Death()
     {
-        /*if (!PhotonNetwork.isMasterClient)*/ photonView.RPC("DeathSync", PhotonTargets.Others);
-        //if (PhotonNetwork.isMasterClient) Destroy(gameObject);   
+        photonView.RPC("DeathSync", PhotonTargets.Others);   
         gameObject.SetActive(false);
         anim.enabled = false;
         isAlive = false;
+        Observable.Timer(TimeSpan.FromSeconds(1))
+            .Subscribe(_ => Destroy(gameObject))
+            .AddTo(gameObject);
     }
 
     [PunRPC]
@@ -327,7 +329,8 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     {
         Debug.Log("RPCCall" + info.sender);
         Debug.Log("破棄同期");
-        //Destroy(gameObject);
+        gameObject.SetActive(false);
+        Destroy(gameObject);        
     }
 
     /// <summary>
