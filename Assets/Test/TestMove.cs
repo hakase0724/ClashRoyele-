@@ -59,7 +59,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     //対象を格納している配列のポインタ
     private int targetPointa = 0;
     private TargetGet targetGet => Camera.main.GetComponent<TargetGet>();
-    private NavMeshAgent nav => GetComponent<NavMeshAgent>();
+    private NavMeshAgent nav;
     private Animator anim => GetComponent<Animator>();
     //攻撃対象を格納する
     private Queue<GameObject> targetQueue = new Queue<GameObject>();
@@ -83,6 +83,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     {
         PhotonNetwork.OnEventCall += this.OnEvent;
         myData = new MyData(transform.position, _UnitHp);
+        nav = GetComponent<NavMeshAgent>();
     }
     private void OnEnable()
     {
@@ -164,6 +165,11 @@ public class TestMove : Photon.MonoBehaviour, IUnit
         if (!isAlive)
         {
             Debug.Log("生死フラグに引っかかった");
+            return;
+        }
+        if(nav == null)
+        {
+            Debug.Log("navに引っかかった");
             return;
         }
         //受け取ったデータを元に自分の情報を更新する
@@ -311,6 +317,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
         gameObject.SetActive(false);
         anim.enabled = false;
         isAlive = false;
+        nav = null;
         //1秒後に自信をDestroyする
         Observable.Timer(TimeSpan.FromSeconds(1))
             .Subscribe(_ => Destroy(gameObject))
