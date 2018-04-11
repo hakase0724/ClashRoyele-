@@ -314,9 +314,18 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     public void Death()
     {
         /*if (!PhotonNetwork.isMasterClient)*/ photonView.RPC("DeathSync", PhotonTargets.Others);
-        //if (PhotonNetwork.isMasterClient) Destroy(gameObject);       
+        //if (PhotonNetwork.isMasterClient) Destroy(gameObject);     
         roomHash.Add(unitId,1);
         isAlive = false;
+    }
+
+    private void RendererEnable()
+    {
+        Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+        foreach (Renderer renderer in renderers)
+        {
+            renderer.enabled = false;
+        }
     }
 
     [PunRPC]
@@ -324,7 +333,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     {
         Debug.Log("RPCCall" + info.sender);
         Debug.Log("破棄同期");
-        Destroy(gameObject);
+        //Destroy(gameObject);
     }
 
     /// <summary>
