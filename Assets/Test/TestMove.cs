@@ -112,7 +112,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
             .Where(_ => !nav.pathPending)
             //対象との距離が0.5未満になったら到着したと判断する
             .Where(_ => nav.remainingDistance < 0.5f)
-            .Subscribe(_ => Move())
+            .Subscribe(_ => Move(),ex => Debug.Log("発生した例外：" + ex + "." + nav))
             .AddTo(gameObject);
 
         unitHp
@@ -360,6 +360,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     private void GoToTarget(GameObject target)
     {
         if (target == null) return;
+        if (nav == null) return;
         if (nav.pathStatus != NavMeshPathStatus.PathInvalid) nav.destination = target.transform.position;
         Attack(attackPower, target);
     }
