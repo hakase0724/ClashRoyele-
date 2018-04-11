@@ -93,7 +93,6 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     private void Start()
     {
         var photonViewId = GetComponent<PhotonView>().viewID = unitId;
-        Debug.Log("割り当てたid:" + photonViewId);
         nav.enabled = true;
         //自分が味方か敵かで対象を変える
         if (isMine.Value) targets.AddRange(targetGet.mArray);
@@ -321,7 +320,9 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     [PunRPC]
     public void DeathSync(int id)
     {
+        Debug.Log("RPCCall");
         if (id != unitId) return;
+        Debug.Log("破棄同期");
         Destroy(gameObject);
     }
 
