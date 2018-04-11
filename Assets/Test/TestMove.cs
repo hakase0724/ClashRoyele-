@@ -194,6 +194,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     /// <param name="animBool">アニメーションのオンオフ</param>
     private void AnimChange(string animName, bool animBool)
     {
+        if (!anim.enabled) return;
         anim.SetBool(animName, animBool);
         if (animBool) nav.speed = 0f;
         else nav.speed = unitSpeed;
@@ -269,7 +270,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
         const int attackInterval = 1;
         var a = attackTarget.GetComponent(typeof(IUnit)) as IUnit;
         Observable.Interval(TimeSpan.FromSeconds(attackInterval))
-            .TakeUntilDestroy(attackTarget)
+            .TakeUntilDisable(attackTarget)
             .Do(_ => Debug.Log(attackTarget))
             .Subscribe(_ => Attack(attack, a), () => Comp())
             .AddTo(gameObject);
@@ -292,6 +293,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     /// </summary>
     private void Comp()
     {
+        Debug.Log("攻撃終了");
         if (targetQueue.Count >= 1) targetQueue.Dequeue();
         if (targetQueue.Count >= 1) GoToTarget(targetQueue.Peek());
         else
@@ -314,18 +316,10 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     public void Death()
     {
         /*if (!PhotonNetwork.isMasterClient)*/ photonView.RPC("DeathSync", PhotonTargets.Others);
-        //if (PhotonNetwork.isMasterClient) Destroy(gameObject);     
-        roomHash.Add(unitId,1);
+        //if (PhotonNetwork.isMasterClient) Destroy(gameObject);   
+        gameObject.SetActive(false);
+        anim.enabled = false;
         isAlive = false;
-    }
-
-    private void RendererEnable()
-    {
-        Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
-        foreach (Renderer renderer in renderers)
-        {
-            renderer.enabled = false;
-        }
     }
 
     [PunRPC]
