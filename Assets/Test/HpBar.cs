@@ -19,7 +19,6 @@ public class HpBar : MonoBehaviour
     {
         var rootComponent = transform.root.GetComponent(typeof(IUnit)) as IUnit;
         var MaxHp = rootComponent.maxUnitHp;
-        Debug.Log(rootComponent.isMine.Value);
         if (rootComponent.isMine.Value) bar.color = colors[0];
         else bar.color = colors[1];
 

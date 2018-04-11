@@ -166,23 +166,10 @@ public class TestMove : Photon.MonoBehaviour, IUnit
             Debug.Log("生死フラグに引っかかった");
             return;
         }
-        if (gameObject == null)
-        {
-            Debug.Log("gameObjectのNullチェックに引っかかった");
-            return;
-        }       
-        if (data == null)
-        {
-            Debug.Log("dataのNullチェックに引っかかった");
-            return;
-        }        
-        if (nav == null)
-        {
-            Debug.Log("navのNullチェックに引っかかった");
-            return;
-        }
         //受け取ったデータを元に自分の情報を更新する
+        //距離の差が2より大きい場合のみ場所を合わせる
         if (CalcDistance(transform.position, -data.myPos) >= 2f) nav.Warp(-data.myPos);
+        //受け取ったデータとそのデータに対応する自分のデータが異なるとき更新する
         if (unitHp.Value != data.myHp) unitHp.Value = data.myHp;
         if (animBool != data.animBool) AnimChange("Attack", data.animBool);
     }
@@ -269,9 +256,11 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     {
         const int attackInterval = 1;
         var a = attackTarget.GetComponent(typeof(IUnit)) as IUnit;
+        //attackIntervalで設定した時間間隔で攻撃する
+        //対象か自分がfalseになるか自分が破棄されたとき攻撃をやめる
         Observable.Interval(TimeSpan.FromSeconds(attackInterval))
             .TakeUntilDisable(attackTarget)
-            .Do(_ => Debug.Log(attackTarget))
+            .TakeUntilDisable(gameObject)
             .Subscribe(_ => Attack(attack, a), () => Comp())
             .AddTo(gameObject);
     }
@@ -315,10 +304,14 @@ public class TestMove : Photon.MonoBehaviour, IUnit
 
     public void Death()
     {
+        //死ぬタイミングを合わせるためにRPC
         photonView.RPC("DeathSync", PhotonTargets.Others);   
+        //死んだタイミングで自分をfalseにする
+        //RPCはfalseになっていても実行できるみたい
         gameObject.SetActive(false);
         anim.enabled = false;
         isAlive = false;
+        //1秒後に自信をDestroyする
         Observable.Timer(TimeSpan.FromSeconds(1))
             .Subscribe(_ => Destroy(gameObject))
             .AddTo(gameObject);
@@ -329,6 +322,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     {
         Debug.Log("RPCCall" + info.sender);
         Debug.Log("破棄同期");
+        //攻撃終了がfalseになったらなので一旦falseにしてからDestroyする
         gameObject.SetActive(false);
         Destroy(gameObject);        
     }
@@ -340,6 +334,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     private void TargetLockOn(GameObject target)
     {
         if (CalcDistance(transform.position, target.transform.position) > targetDistance * targetDistance) return;
+        //まだ攻撃対象がいなければ
         if (targetQueue.Count <= 0)
         {
             GoToTarget(target);
