@@ -8,7 +8,9 @@ public class InstantiateData :Photon.MonoBehaviour
 {
     private int _prefabNumber;
     private Main main => GetComponent<Main>();
-    private byte unitId = 0;
+    //生成時ユニットに割り当てるid
+    //1から割り当てる
+    private byte unitId = 1;
 
     [SerializeField]
     private GameObject[] prefabs = new GameObject[0];

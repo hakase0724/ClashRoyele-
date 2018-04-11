@@ -9,7 +9,7 @@ using UnityEngine.AI;
 using UnityEngine.UI;
 using static StaticUse;
 
-public class TestMove : Photon.MonoBehaviour,IUnit
+public class TestMove : Photon.MonoBehaviour, IUnit
 {
     /// <summary>
     /// ユニットの情報を格納
@@ -20,14 +20,14 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         public float myHp;
         public bool animBool = false;
 
-        public MyData(Vector3 pos,float hp,bool animBool)
+        public MyData(Vector3 pos, float hp, bool animBool)
         {
             myPos = pos;
             myHp = hp;
             this.animBool = animBool;
         }
 
-        public MyData(Vector3 pos,float hp)
+        public MyData(Vector3 pos, float hp)
         {
             myPos = pos;
             myHp = hp;
@@ -39,7 +39,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
             myHp = hp;
         }
 
-        public void DataSet(Vector3 pos, float hp,bool animBool)
+        public void DataSet(Vector3 pos, float hp, bool animBool)
         {
             myPos = pos;
             myHp = hp;
@@ -53,7 +53,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     public FloatReactiveProperty unitHp { get; set; } = new FloatReactiveProperty();
     public float unitEnergy { get; set; } = 1;
     public float unitSpeed { get; set; }
-    public float maxUnitHp { get {return _UnitHp; } }
+    public float maxUnitHp { get { return _UnitHp; } }
     public byte unitId { get; set; }
 
     //対象を格納している配列のポインタ
@@ -90,13 +90,15 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         unitSpeed = _UnitSpeed;
         unitHp.Value = _UnitHp;
     }
-    private  void Start()
+    private void Start()
     {
-        nav.enabled = true;       
+        var photonViewId = GetComponent<PhotonView>().viewID = unitId;
+        Debug.Log("割り当てたid:" + photonViewId);
+        nav.enabled = true;
         //自分が味方か敵かで対象を変える
         if (isMine.Value) targets.AddRange(targetGet.mArray);
         else targets.AddRange(targetGet.eArray);
-        LeftOrRight();            
+        LeftOrRight();
         //目的地に近づいたときに減速しないようにする
         nav.autoBraking = false;
 
@@ -118,10 +120,10 @@ public class TestMove : Photon.MonoBehaviour,IUnit
             .AddTo(gameObject);
 
         //対応するオブジェクトと同期をする　
-        //現在は3秒に一回同期している 
+        //現在は2秒に一回同期している 
         //マスタークライアントのみ送信する
         Observable.Interval(TimeSpan.FromSeconds(2))
-            .Where(_=> PhotonNetwork.isMasterClient)
+            .Where(_ => PhotonNetwork.isMasterClient)
             .Subscribe(_ => RaiseEvent())
             .AddTo(gameObject);
     }
@@ -132,7 +134,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     private void RaiseEvent()
     {
         //myDataにデータをセット
-        myData.DataSet(transform.position, unitHp.Value,animBool);
+        myData.DataSet(transform.position, unitHp.Value, animBool);
         //データを送るため送るデータをobject型の配列に格納
         object[] content = new object[3];
         content[0] = myData.myPos;
@@ -164,34 +166,24 @@ public class TestMove : Photon.MonoBehaviour,IUnit
             Debug.Log("生死フラグに引っかかった");
             return;
         }
-        if(gameObject == null)
+        if (gameObject == null)
         {
             Debug.Log("gameObjectのNullチェックに引っかかった");
             return;
-        }
-        if (transform.position == null)
-        {
-            Debug.Log("transformのNullチェックに引っかかった");
-            return;
-        }
-        if(data == null)
+        }       
+        if (data == null)
         {
             Debug.Log("dataのNullチェックに引っかかった");
             return;
-        }
-        if (data.myPos == null)
-        {
-            Debug.Log("data.myPosのNullチェックに引っかかった");
-            return;
-        }
+        }        
         if (nav == null)
         {
             Debug.Log("navのNullチェックに引っかかった");
             return;
         }
         //受け取ったデータを元に自分の情報を更新する
-        if (CalcDistance(transform.position,-data.myPos) >= 2f) nav.Warp(-data.myPos);
-        if(unitHp.Value != data.myHp) unitHp.Value = data.myHp;
+        if (CalcDistance(transform.position, -data.myPos) >= 2f) nav.Warp(-data.myPos);
+        if (unitHp.Value != data.myHp) unitHp.Value = data.myHp;
         if (animBool != data.animBool) AnimChange("Attack", data.animBool);
     }
 
@@ -200,9 +192,9 @@ public class TestMove : Photon.MonoBehaviour,IUnit
     /// </summary>
     /// <param name="animName">アニメーション名</param>
     /// <param name="animBool">アニメーションのオンオフ</param>
-    private void AnimChange(string animName,bool animBool)
+    private void AnimChange(string animName, bool animBool)
     {
-        anim.SetBool(animName,animBool);
+        anim.SetBool(animName, animBool);
         if (animBool) nav.speed = 0f;
         else nav.speed = unitSpeed;
     }
@@ -239,7 +231,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         if (targets[targetPointa] == null)
         {
             animBool = true;
-            AnimChange("Attack",animBool);
+            AnimChange("Attack", animBool);
             return;
         }
         if (!anim.enabled) anim.enabled = true;
@@ -268,7 +260,8 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         {
             renderer.material.color = color[colorNumber];
         }
-        if (!isMine.Value) transform.rotation = Quaternion.Euler(0, 180, 0);    
+        //生成者が自分でなければ向きを反転させる
+        if (!isMine.Value) transform.rotation = Quaternion.Euler(0, 180, 0);
     }
 
     public void Attack(float attack, GameObject attackTarget)
@@ -277,8 +270,8 @@ public class TestMove : Photon.MonoBehaviour,IUnit
         var a = attackTarget.GetComponent(typeof(IUnit)) as IUnit;
         Observable.Interval(TimeSpan.FromSeconds(attackInterval))
             .TakeUntilDestroy(attackTarget)
-            .Do(_=>Debug.Log(attackTarget))
-            .Subscribe(_ => Attack(attack,a),() => Comp())
+            .Do(_ => Debug.Log(attackTarget))
+            .Subscribe(_ => Attack(attack, a), () => Comp())
             .AddTo(gameObject);
     }
 
@@ -310,7 +303,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
             }
             animBool = false;
             AnimChange("Attack", animBool);
-        }    
+        }
     }
 
     public void Damage(float damage)
@@ -320,7 +313,7 @@ public class TestMove : Photon.MonoBehaviour,IUnit
 
     public void Death()
     {
-        if(PhotonNetwork.isMasterClient)photonView.RPC("DeathSync", PhotonTargets.Others, unitId);
+        if (PhotonNetwork.isMasterClient) photonView.RPC("DeathSync", PhotonTargets.Others, unitId);
         Destroy(gameObject);
         isAlive = false;
     }
