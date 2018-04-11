@@ -115,6 +115,11 @@ public class TestMove : Photon.MonoBehaviour, IUnit
             .Subscribe(_ => Move(),ex => Debug.Log("発生した例外：" + ex + "." + nav))
             .AddTo(gameObject);
 
+        this.UpdateAsObservable()
+            .Where(_ => Input.GetKeyDown(KeyCode.P))
+            .Subscribe(_ => Debug.Log("ユニットID:" + unitId + "対象位置" + nav.destination))
+            .AddTo(gameObject);
+
         unitHp
             .Where(x => x <= 0)
             .Subscribe(x => Death())
@@ -290,7 +295,17 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     {
         Debug.Log("攻撃終了");
         if (targetQueue.Count >= 1) targetQueue.Dequeue();
-        if (targetQueue.Count >= 1) GoToTarget(targetQueue.Peek());
+        if (targetQueue.Count >= 1)
+        {
+            if(CalcDistance(transform.position,targetQueue.Peek().transform.position) > targetDistance)
+            {
+                targetQueue.Dequeue();
+            }
+            else
+            {
+                GoToTarget(targetQueue.Peek());
+            }            
+        }
         else
         {
             if (targets.Count <= targetPointa) return;
