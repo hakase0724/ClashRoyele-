@@ -66,6 +66,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     //向かう場所左→右の順で格納している
     private List<Vector3> targets = new List<Vector3>();
     private bool isAlive = true;
+    private ExitGames.Client.Photon.Hashtable roomHash = new ExitGames.Client.Photon.Hashtable();
 
     [SerializeField]
     private float _UnitHp;
@@ -92,7 +93,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     }
     private void Start()
     {
-        var photonViewId = GetComponent<PhotonView>().viewID = unitId;
+        GetComponent<PhotonView>().viewID = unitId;
         nav.enabled = true;
         //自分が味方か敵かで対象を変える
         if (isMine.Value) targets.AddRange(targetGet.mArray);
@@ -312,16 +313,16 @@ public class TestMove : Photon.MonoBehaviour, IUnit
 
     public void Death()
     {
-        if (PhotonNetwork.isMasterClient) photonView.RPC("DeathSync", PhotonTargets.Others, unitId);
-        Destroy(gameObject);
+        /*if (!PhotonNetwork.isMasterClient)*/ photonView.RPC("DeathSync", PhotonTargets.Others);
+        //if (PhotonNetwork.isMasterClient) Destroy(gameObject);       
+        roomHash.Add(unitId,1);
         isAlive = false;
     }
 
     [PunRPC]
-    public void DeathSync(int id)
+    public void DeathSync(PhotonMessageInfo info)
     {
-        Debug.Log("RPCCall");
-        if (id != unitId) return;
+        Debug.Log("RPCCall" + info.sender);
         Debug.Log("破棄同期");
         Destroy(gameObject);
     }

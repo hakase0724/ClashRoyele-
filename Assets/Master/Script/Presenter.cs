@@ -11,8 +11,6 @@ public class Presenter : MonoBehaviour
     [SerializeField]
     private InputField nameInput;
     [SerializeField]
-    private Model model;
-    [SerializeField]
     private Master master;
 
     private void Start()
