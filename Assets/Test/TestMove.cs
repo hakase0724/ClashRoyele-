@@ -120,6 +120,17 @@ public class TestMove : Photon.MonoBehaviour, IUnit
             .Subscribe(_ => Debug.Log("ユニットID:" + unitId + "対象位置" + nav.destination))
             .AddTo(gameObject);
 
+        this.UpdateAsObservable()
+            .Where(_ => Input.GetKeyDown(KeyCode.T))
+            .Subscribe(_ => 
+            {
+                foreach(var t in targetQueue)
+                {
+                    Debug.Log("攻撃対象の中身" + t);
+                }
+            })
+            .AddTo(gameObject);
+
         unitHp
             .Where(x => x <= 0)
             .Subscribe(x => Death())
@@ -192,10 +203,12 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     /// <param name="animBool">アニメーションのオンオフ</param>
     private void AnimChange(string animName, bool animBool)
     {
+        Debug.Log("ユニット：" + unitId + "フラグ" + animBool);
         if (!anim.enabled) return;
         anim.SetBool(animName, animBool);
         if (animBool) nav.speed = 0f;
         else nav.speed = unitSpeed;
+        Debug.Log("ユニット：" + unitId + "移動速度" + nav.speed);
     }
 
     /// <summary>
@@ -295,7 +308,14 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     {
         Debug.Log("攻撃終了");
         if (targetQueue.Count >= 1) targetQueue.Dequeue();
-        if (targetQueue.Count >= 1)
+        Debug.Log("ループ入る");
+        while (targetQueue.Peek() == null)
+        {
+            targetQueue.Dequeue();
+            Debug.Log("nullを吐き出す");
+        }
+        Debug.Log("ループ出た");
+        if (targetQueue.Count >= 1 && targetQueue.Peek() != null)
         {
             if(CalcDistance(transform.position,targetQueue.Peek().transform.position) > targetDistance)
             {
@@ -315,6 +335,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
             }
             animBool = false;
             AnimChange("Attack", animBool);
+            Debug.Log("ユニットID:" + unitId + "通常移動に移行");
         }
     }
 
