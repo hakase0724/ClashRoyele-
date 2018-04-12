@@ -115,35 +115,6 @@ public class TestMove : Photon.MonoBehaviour, IUnit
             .Subscribe(_ => Move(), ex => Debug.Log("発生した例外：" + ex + "." + nav))
             .AddTo(gameObject);
 
-        this.UpdateAsObservable()
-            .Where(_ => Input.GetKeyDown(KeyCode.P))
-            .Subscribe(_ =>
-            {
-                Debug.Log("ユニットID:" + unitId + "対象位置" + nav.destination + "今の速度" + nav.speed + "今のアニメーションフラグ" + animBool);
-            })
-            .AddTo(gameObject);
-
-        this.UpdateAsObservable()
-            .Where(_ => Input.GetKeyDown(KeyCode.T))
-            .Subscribe(_ =>
-            {
-                foreach (var t in targetQueue)
-                {
-                    Debug.Log("ユニットID:" + unitId + "攻撃対象の中身" + t);
-                }
-            })
-            .AddTo(gameObject);
-
-        this.UpdateAsObservable()
-            .Where(_ => Input.GetKeyDown(KeyCode.Space))
-            .Subscribe(_ =>
-            {
-                anim.SetBool("Attack", false);
-                nav.speed = unitSpeed;
-                nav.SetDestination(targets[targetPointa]);
-            })
-            .AddTo(gameObject);
-
         unitHp
             .Where(x => x <= 0)
             .Subscribe(x => Death())
@@ -172,7 +143,6 @@ public class TestMove : Photon.MonoBehaviour, IUnit
         content[2] = myData.animBool;
         content[3] = targetPointa;
         PhotonNetwork.RaiseEvent(unitId, content, true, null);
-        Debug.Log("データ送信");
     }
 
     /// <summary>
@@ -192,16 +162,8 @@ public class TestMove : Photon.MonoBehaviour, IUnit
         //変換した配列の中身をMyData型に変換
         var data = new MyData((Vector3)obj[0], (float)obj[1], (bool)obj[2]);
         //Nullチェック
-        if (!isAlive)
-        {
-            Debug.Log("生死フラグに引っかかった");
-            return;
-        }
-        if (nav == null)
-        {
-            Debug.Log("navに引っかかった");
-            return;
-        }
+        if (!isAlive) return;
+        if (nav == null) return;
         //受け取ったデータを元に自分の情報を更新する
         //距離の差が2より大きい場合のみ場所を合わせる
         if (CalcDistance(transform.position, -data.myPos) >= 2f) nav.Warp(-data.myPos);
@@ -209,11 +171,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
         //体力
         if (unitHp.Value != data.myHp) unitHp.Value = data.myHp;
         //アニメーションフラグ
-        if (animBool != data.animBool)
-        {
-            Debug.Log("ユニットID:" + unitId + "メソッド名:OnEvent,AnimChangeCall!");
-            AnimChange("Attack", data.animBool);
-        }
+        if (animBool != data.animBool) AnimChange("Attack", data.animBool);
         //対象配列のポインタ
         if (targetPointa != (int)obj[3]) targetPointa = (int)obj[3];
     }
@@ -225,13 +183,11 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     /// <param name="animBool">アニメーションのオンオフ</param>
     private void AnimChange(string animName, bool animBool)
     {
-        Debug.Log("ユニット：" + unitId + "フラグ" + animBool);
         if (!anim.enabled) return;
         anim.SetBool(animName, animBool);
         if (animBool) nav.speed = 0f;
         else nav.speed = unitSpeed;
         GetComponent<Rigidbody>().velocity = Vector3.zero;
-        Debug.Log("ユニット：" + unitId + "移動速度" + nav.speed);
     }
 
     /// <summary>
@@ -252,9 +208,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
         if (targets.Count <= 0) return;
         if (targetPointa >= targets.Count)
         {
-            Debug.Log("対象がいない");
             animBool = true;
-            Debug.Log("ユニットID:" + unitId + "メソッド名:Move,AnimChangeCall!");
             AnimChange("Attack", animBool);
             return;
         }
@@ -279,7 +233,6 @@ public class TestMove : Photon.MonoBehaviour, IUnit
             colorNumber = 1;
             isMine.Value = false;
         }
-        //判別結果に応じて識別番号を更新
         foreach (Renderer renderer in renderers)
         {
             renderer.material.color = color[colorNumber];
@@ -307,10 +260,8 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     /// <param name="target">対象</param>
     private void Attack(float attack, IUnit target)
     {
-        Debug.Log("攻撃する");
         target.Damage(attack);
         animBool = true;
-        Debug.Log("ユニットID:" + unitId + "メソッド名:Attack,AnimChangeCall!");
         AnimChange("Attack", animBool);
     }
 
@@ -319,21 +270,31 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     /// </summary>
     private void Comp()
     {
-        Debug.Log("ユニットID:" + unitId + "攻撃終了");
         if (targetQueue.Count >= 1) targetQueue.Dequeue();
         if (targetQueue.Any())
         {
             //攻撃対象がnullになっていたら消すnullでなくなったら処理を次に進める
+            int dequeueCount = 0;
             foreach (var t in targetQueue)
             {
-                if (t == null) targetQueue.Dequeue();
+                if (t == null) dequeueCount++;
                 if (t != null) break;
             }
-        }       
+            for(int i = 0;i > dequeueCount; i++)
+            {
+                targetQueue.Dequeue();
+            }
+        }
         if (targetQueue.Count >= 1 && targetQueue.Peek() != null)
-        {
-            if (CalcDistance(transform.position, targetQueue.Peek().transform.position) > targetDistance) targetQueue.Dequeue();
-            else GoToTarget(targetQueue.Peek());
+        {            
+            if (CalcDistance(transform.position, targetQueue.Peek().transform.position) > targetDistance)
+            {
+                targetQueue.Dequeue();
+            }
+            else
+            {
+                GoToTarget(targetQueue.Peek());
+            }
         }
         else
         {
@@ -341,9 +302,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
             if (nav == null) return;
             if (nav.pathStatus != NavMeshPathStatus.PathInvalid) nav.destination = targets[targetPointa];
             animBool = false;
-            Debug.Log("ユニットID:" + unitId + "メソッド名:Comp,AnimChangeCall!");
             AnimChange("Attack", animBool);
-            Debug.Log("ユニットID:" + unitId + "通常移動に移行");
         }
     }
 
@@ -358,20 +317,28 @@ public class TestMove : Photon.MonoBehaviour, IUnit
         photonView.RPC("DeathSync", PhotonTargets.Others);
         //死んだタイミングで自分をfalseにする
         gameObject.SetActive(false);
+        //RendererDisaible();
         anim.enabled = false;
         isAlive = false;
         nav = null;
-        //1秒後に自信をDestroyする
+        //1秒後に自身をDestroyする
         Observable.Timer(TimeSpan.FromSeconds(1))
             .Subscribe(_ => Destroy(gameObject))
             .AddTo(gameObject);
     }
 
-    [PunRPC]
-    public void DeathSync(PhotonMessageInfo info)
+    private void RendererDisaible()
     {
-        Debug.Log("RPCCall" + info.sender);
-        Debug.Log("破棄同期");
+        Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+        foreach (Renderer renderer in renderers)
+        {
+            renderer.enabled = false;
+        }
+    }
+
+    [PunRPC]
+    public void DeathSync()
+    {
         Destroy(gameObject);
     }
 
@@ -408,22 +375,30 @@ public class TestMove : Photon.MonoBehaviour, IUnit
 
     private void OnTriggerEnter(Collider other)
     {
-        var otherUnit = other.GetComponent(typeof(IUnit)) as IUnit;
-        if (otherUnit == null) return;
-        //同一生成者なら無視する
-        if (otherUnit.isMine.Value == isMine.Value) return;
+        if (CheckIUnit(other) == null) return;
         TargetLockOn(other.gameObject);
         nav.speed = 0f;
     }
 
     private void OnTriggerStay(Collider other)
     {
-        var otherUnit = other.GetComponent(typeof(IUnit)) as IUnit;
-        if (otherUnit == null) return;
-        //同一生成者なら無視する
-        if (otherUnit.isMine.Value == isMine.Value) return;
+        if (CheckIUnit(other) == null) return;
         var cheak = targetQueue.Where(x => x == other.gameObject);
         if (cheak.Count() <= 0) targetQueue.Enqueue(other.gameObject); 
+    }
+
+    /// <summary>
+    /// IUnitの有無を確認しなければnullを返す
+    /// </summary>
+    /// <param name="other">OnTriggerでわたされるCollider</param>
+    /// <returns></returns>
+    private GameObject CheckIUnit(Collider other)
+    {
+        var unit = other.GetComponent(typeof(IUnit)) as IUnit;
+        if (unit == null) return null;
+        //同一生成者なら無視する
+        if (unit.isMine.Value == isMine.Value) return null;
+        return other.gameObject;
     }
 }
 

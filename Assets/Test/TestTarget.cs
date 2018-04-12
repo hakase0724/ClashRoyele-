@@ -51,7 +51,6 @@ public class TestTarget :Photon.MonoBehaviour,IBuilding,IUnit
 
     public void Damage(float damage)
     {
-        Debug.Log("ダメージ発生" + damage);
         unitHp.Value -= damage;
     }
 
