@@ -18,7 +18,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
         public Vector3 myPos;
         //ユニットの体力
         public float myHp;
-        //ユニットのzにメーションフラグ
+        //ユニットのアニメーションフラグ
         public bool animBool = false;
 
         public MyData(Vector3 pos, float hp, bool animBool)
@@ -166,10 +166,11 @@ public class TestMove : Photon.MonoBehaviour, IUnit
         //myDataにデータをセット
         myData.DataSet(transform.position, unitHp.Value, animBool);
         //データを送るため送るデータをobject型の配列に格納
-        object[] content = new object[3];
+        object[] content = new object[4];
         content[0] = myData.myPos;
         content[1] = myData.myHp;
         content[2] = myData.animBool;
+        content[3] = targetPointa;
         PhotonNetwork.RaiseEvent(unitId, content, true, null);
         Debug.Log("データ送信");
     }
@@ -210,7 +211,8 @@ public class TestMove : Photon.MonoBehaviour, IUnit
         {
             Debug.Log("ユニットID:" + unitId + "メソッド名:OnEvent,AnimBoolCall!");
             AnimChange("Attack", data.animBool);
-        } 
+        }
+        if (targetPointa != (int)obj[3]) targetPointa = (int)obj[3];
     }
 
     /// <summary>
