@@ -34,7 +34,6 @@ public class PlayerUnit : Photon.MonoBehaviour, IUnit
     private GameObject stageScript => GameObject.FindGameObjectWithTag("Main");
     //次に狙う対象
     private GameObject target;
-    private List<GameObject> targets = new List<GameObject>();
     private List<IDisposable> updateStreams = new List<IDisposable>();
     //ユニットの移動速度
     private float unitSpeed;

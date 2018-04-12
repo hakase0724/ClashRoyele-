@@ -13,7 +13,6 @@ using static StaticUse;
 /// </summary>
 public class Master : Photon.PunBehaviour
 {
-    private PlayerData playerData = new PlayerData();
     [SerializeField]
     private GameObject inputCanvas;
     [SerializeField]
@@ -50,7 +49,6 @@ public class Master : Photon.PunBehaviour
     {
         inputCanvas.SetActive(false);
         waitCanvas.SetActive(true);
-        playerData = data;
         PhotonNetwork.playerName = data.playerName;
         PhotonNetwork.ConnectUsingSettings("0." + SceneManagerHelper.ActiveSceneBuildIndex);
         //同期間隔
@@ -61,19 +59,13 @@ public class Master : Photon.PunBehaviour
     }
 
     //ロビーに入った時、Roomを探して入る
-    private void OnJoinedLobby() => PhotonNetwork.JoinRandomRoom();
+    new private void OnJoinedLobby() => PhotonNetwork.JoinRandomRoom();
 
     //マスターサーバーへ接続した時、Roomを探して入る
     public override void OnConnectedToMaster() => PhotonNetwork.JoinRandomRoom();
 
     //Room参加失敗時、名前なしRoom作成し入る
     private void OnPhotonRandomJoinFailed() => PhotonNetwork.CreateRoom(null);
-
-    //Room参加成功時、メインシーンをロードする
-    private void OnJoinedRoom()
-    {
-        
-    }
 
     //Photon接続状態をGUIに表示する
     private void OnGUI() => GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());

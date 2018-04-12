@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UniRx;
 using UniRx.Triggers;
+using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.UI;
 using static StaticUse;
 
 public class TestMove : Photon.MonoBehaviour, IUnit
@@ -16,8 +14,11 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     /// </summary>
     public class MyData
     {
+        //ユニットの位置
         public Vector3 myPos;
+        //ユニットの体力
         public float myHp;
+        //ユニットのzにメーションフラグ
         public bool animBool = false;
 
         public MyData(Vector3 pos, float hp, bool animBool)
@@ -66,9 +67,8 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     //向かう場所左→右の順で格納している
     private List<Vector3> targets = new List<Vector3>();
     private bool isAlive = true;
-    private ExitGames.Client.Photon.Hashtable roomHash = new ExitGames.Client.Photon.Hashtable();
 
-    [SerializeField]
+    [SerializeField, Tooltip("自分の体力")]
     private float _UnitHp;
     [SerializeField, Tooltip("自分と相手のときそれぞれの色")]
     private Color[] color = new Color[0];
@@ -112,22 +112,35 @@ public class TestMove : Photon.MonoBehaviour, IUnit
             .Where(_ => !nav.pathPending)
             //対象との距離が0.5未満になったら到着したと判断する
             .Where(_ => nav.remainingDistance < 0.5f)
-            .Subscribe(_ => Move(),ex => Debug.Log("発生した例外：" + ex + "." + nav))
+            .Subscribe(_ => Move(), ex => Debug.Log("発生した例外：" + ex + "." + nav))
             .AddTo(gameObject);
 
         this.UpdateAsObservable()
             .Where(_ => Input.GetKeyDown(KeyCode.P))
-            .Subscribe(_ => Debug.Log("ユニットID:" + unitId + "対象位置" + nav.destination))
+            .Subscribe(_ =>
+            {
+                Debug.Log("ユニットID:" + unitId + "対象位置" + nav.destination + "今の速度" + nav.speed + "今のアニメーションフラグ" + animBool);
+            })
             .AddTo(gameObject);
 
         this.UpdateAsObservable()
             .Where(_ => Input.GetKeyDown(KeyCode.T))
-            .Subscribe(_ => 
+            .Subscribe(_ =>
             {
-                foreach(var t in targetQueue)
+                foreach (var t in targetQueue)
                 {
-                    Debug.Log("攻撃対象の中身" + t);
+                    Debug.Log("ユニットID:" + unitId + "攻撃対象の中身" + t);
                 }
+            })
+            .AddTo(gameObject);
+
+        this.UpdateAsObservable()
+            .Where(_ => Input.GetKeyDown(KeyCode.Space))
+            .Subscribe(_ =>
+            {
+                anim.SetBool("Attack", false);
+                nav.speed = unitSpeed;
+                nav.SetDestination(targets[targetPointa]);
             })
             .AddTo(gameObject);
 
@@ -183,7 +196,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
             Debug.Log("生死フラグに引っかかった");
             return;
         }
-        if(nav == null)
+        if (nav == null)
         {
             Debug.Log("navに引っかかった");
             return;
@@ -193,7 +206,11 @@ public class TestMove : Photon.MonoBehaviour, IUnit
         if (CalcDistance(transform.position, -data.myPos) >= 2f) nav.Warp(-data.myPos);
         //受け取ったデータとそのデータに対応する自分のデータが異なるとき更新する
         if (unitHp.Value != data.myHp) unitHp.Value = data.myHp;
-        if (animBool != data.animBool) AnimChange("Attack", data.animBool);
+        if (animBool != data.animBool)
+        {
+            Debug.Log("ユニットID:" + unitId + "メソッド名:OnEvent,AnimBoolCall!");
+            AnimChange("Attack", data.animBool);
+        } 
     }
 
     /// <summary>
@@ -239,10 +256,11 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     public void Move()
     {
         if (targets.Count <= 0) return;
-        if (targetPointa >= targets.Count) return;
-        if (targets[targetPointa] == null)
+        if (targetPointa >= targets.Count)
         {
+            Debug.Log("対象がいない");
             animBool = true;
+            Debug.Log("ユニットID:" + unitId + "メソッド名:Move,AnimBoolCall!");
             AnimChange("Attack", animBool);
             return;
         }
@@ -283,8 +301,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
         //attackIntervalで設定した時間間隔で攻撃する
         //対象か自分がfalseになるか自分が破棄されたとき攻撃をやめる
         Observable.Interval(TimeSpan.FromSeconds(attackInterval))
-            .TakeUntilDisable(attackTarget)
-            .TakeUntilDisable(gameObject)
+            .TakeUntilDestroy(attackTarget)
             .Subscribe(_ => Attack(attack, a), () => Comp())
             .AddTo(gameObject);
     }
@@ -296,8 +313,10 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     /// <param name="target">対象</param>
     private void Attack(float attack, IUnit target)
     {
+        Debug.Log("攻撃する");
         target.Damage(attack);
         animBool = true;
+        Debug.Log("ユニットID:" + unitId + "メソッド名:Attack,AnimBoolCall!");
         AnimChange("Attack", animBool);
     }
 
@@ -306,25 +325,18 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     /// </summary>
     private void Comp()
     {
-        Debug.Log("攻撃終了");
+        Debug.Log("ユニットID:" + unitId + "攻撃終了");
         if (targetQueue.Count >= 1) targetQueue.Dequeue();
-        Debug.Log("ループ入る");
-        while (targetQueue.Peek() == null)
-        {
-            targetQueue.Dequeue();
-            Debug.Log("nullを吐き出す");
-        }
-        Debug.Log("ループ出た");
         if (targetQueue.Count >= 1 && targetQueue.Peek() != null)
         {
-            if(CalcDistance(transform.position,targetQueue.Peek().transform.position) > targetDistance)
+            if (CalcDistance(transform.position, targetQueue.Peek().transform.position) > targetDistance)
             {
                 targetQueue.Dequeue();
             }
             else
             {
                 GoToTarget(targetQueue.Peek());
-            }            
+            }
         }
         else
         {
@@ -334,6 +346,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
                 nav.destination = targets[targetPointa];
             }
             animBool = false;
+            Debug.Log("ユニットID:" + unitId + "メソッド名:Comp,AnimBoolCall!");
             AnimChange("Attack", animBool);
             Debug.Log("ユニットID:" + unitId + "通常移動に移行");
         }
@@ -347,7 +360,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     public void Death()
     {
         //死ぬタイミングを合わせるためにRPC
-        photonView.RPC("DeathSync", PhotonTargets.Others);   
+        photonView.RPC("DeathSync", PhotonTargets.Others);
         //死んだタイミングで自分をfalseにする
         //RPCはfalseになっていても実行できるみたい
         gameObject.SetActive(false);
@@ -365,9 +378,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     {
         Debug.Log("RPCCall" + info.sender);
         Debug.Log("破棄同期");
-        //攻撃終了がfalseになったらなので一旦falseにしてからDestroyする
-        gameObject.SetActive(false);
-        Destroy(gameObject);        
+        Destroy(gameObject);
     }
 
     /// <summary>
