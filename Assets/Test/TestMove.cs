@@ -63,10 +63,12 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     private NavMeshAgent nav;
     private Animator anim => GetComponent<Animator>();
     //攻撃対象を格納する
-    private Queue<GameObject> targetQueue = new Queue<GameObject>();
+    //private Queue<GameObject> targetQueue = new Queue<GameObject>();
+    private List<GameObject> targetList = new List<GameObject>();
     //向かう場所左→右の順で格納している
     private List<Vector3> targets = new List<Vector3>();
     private bool isAlive = true;
+    private AnimatorStateInfo info;
 
     [SerializeField, Tooltip("自分の体力")]
     private float _UnitHp;
@@ -124,6 +126,25 @@ public class TestMove : Photon.MonoBehaviour, IUnit
                 }            
             })
             .AddTo(gameObject);
+
+        //this.UpdateAsObservable()
+        //    .Where(_ => Input.GetKeyDown(KeyCode.A))
+        //    .Subscribe(_ =>
+        //    {
+        //        if (!targetList.Any())
+        //        {
+        //            Debug.Log("ユニットID:" + unitId + "攻撃対象がいない");
+        //            Move();
+        //        }
+        //        else
+        //        {
+        //            GoToTarget(targetList.First());
+        //        }
+        //        foreach (var t in targetList)
+        //        {
+        //            Debug.Log("ユニットID:" + unitId + "攻撃対象" + (t.GetComponent(typeof(IUnit)) as IUnit).unitId);
+        //        }
+        //    });
 
         unitHp
             .Where(x => x <= 0)
@@ -215,17 +236,41 @@ public class TestMove : Photon.MonoBehaviour, IUnit
 
     public void Move()
     {
-        if (targets.Count <= 0) return;
+        if(isMove()) targetPointa++;
+    }
+
+    /// <summary>
+    /// 移動する
+    /// 移動できなければfalseを返す
+    /// </summary>
+    /// <returns></returns>
+    private bool isMove()
+    {
+        //ターゲットが存在しない
+        if (targets.Count <= 0) return false;
+        //ナビが存在しない
+        if (nav == null) return false;
+        //ポインタが配列の末以上を指している
         if (targetPointa >= targets.Count)
         {
             animBool = true;
             AnimChange("Attack", animBool);
-            return;
+            return false;
         }
+        //それぞれのコンポーネントのenableがfalseであればtrueにする
         if (!anim.enabled) anim.enabled = true;
         if (!nav.enabled) nav.enabled = true;
+        //目的地へ移動
         nav.destination = targets[targetPointa];
-        targetPointa++;
+        //ユニットの速度が自身の速度と異なっていたら自身の速度にする
+        if (nav.speed != unitSpeed) nav.speed = unitSpeed;
+        //移動アニメーションを再生できないフラグであればできるようにする
+        if (animBool)
+        {
+            animBool = false;
+            AnimChange("Attack", animBool);
+        }
+        return true;
     }
 
     public void MyColor(int id)
@@ -243,10 +288,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
             colorNumber = 1;
             isMine.Value = false;
         }
-        foreach (Renderer renderer in renderers)
-        {
-            renderer.material.color = color[colorNumber];
-        }
+        foreach (Renderer renderer in renderers) renderer.material.color = color[colorNumber];
         //生成者が自分でなければ向きを反転させる
         if (!isMine.Value) transform.rotation = Quaternion.Euler(0, 180, 0);
     }
@@ -256,7 +298,6 @@ public class TestMove : Photon.MonoBehaviour, IUnit
         const int attackInterval = 1;
         var a = attackTarget.GetComponent(typeof(IUnit)) as IUnit;
         //attackIntervalで設定した時間間隔で攻撃する
-        //対象か自分がfalseになるか自分が破棄されたとき攻撃をやめる
         Observable.Interval(TimeSpan.FromSeconds(attackInterval))
             .TakeUntilDestroy(attackTarget)
             .Subscribe(_ => Attack(attack, a), () => Comp())
@@ -280,40 +321,17 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     /// </summary>
     private void Comp()
     {
-        if (targetQueue.Count >= 1) targetQueue.Dequeue();
-        if (targetQueue.Any())
+        if (targetList.Any()) targetList.RemoveAt(0);
+        if (targetList.Any())
         {
-            //攻撃対象がnullになっていたら消すnullでなくなったら処理を次に進める
-            int dequeueCount = 0;
-            foreach (var t in targetQueue)
-            {
-                if (t == null) dequeueCount++;
-                if (t != null) break;
-            }
-            for(int i = 0;i > dequeueCount; i++)
-            {
-                targetQueue.Dequeue();
-            }
+            var attackList = targetList
+                .Where(x => x != null)
+                .Where(x => CalcDistance(transform.position, x.transform.position) > targetDistance);
+            if (attackList.Any()) GoToTarget(attackList.First());
+            else isMove();
+            targetList = attackList.ToList();
         }
-        if (targetQueue.Count >= 1 && targetQueue.Peek() != null)
-        {            
-            if (CalcDistance(transform.position, targetQueue.Peek().transform.position) > targetDistance)
-            {
-                targetQueue.Dequeue();
-            }
-            else
-            {
-                GoToTarget(targetQueue.Peek());
-            }
-        }
-        else
-        {
-            if (targets.Count <= targetPointa) return;
-            if (nav == null) return;
-            if (nav.pathStatus != NavMeshPathStatus.PathInvalid) nav.destination = targets[targetPointa];
-            animBool = false;
-            AnimChange("Attack", animBool);
-        }
+        else isMove();
     }
 
     public void Damage(float damage)
@@ -325,8 +343,6 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     {
         //死ぬタイミングを合わせるためにRPC
         photonView.RPC("DeathSync", PhotonTargets.Others);
-        //死んだタイミングで自分をfalseにする
-        //gameObject.SetActive(false);
         RendererDisaible();
         anim.enabled = false;
         isAlive = false;
@@ -340,16 +356,12 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     private void RendererDisaible()
     {
         Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
-        foreach (Renderer renderer in renderers)
-        {
-            renderer.enabled = false;
-        }
+        foreach (Renderer renderer in renderers) renderer.enabled = false;
     }
 
     [PunRPC]
     public void DeathSync()
     {
-        Debug.Log("破棄");
         Destroy(gameObject);
     }
 
@@ -360,16 +372,8 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     private void TargetLockOn(GameObject target)
     {
         if (CalcDistance(transform.position, target.transform.position) > targetDistance * targetDistance) return;
-        //まだ攻撃対象がいなければ
-        if (targetQueue.Count <= 0)
-        {
-            GoToTarget(target);
-            targetQueue.Enqueue(target);
-        }
-        else
-        {
-            targetQueue.Enqueue(target);
-        }
+        if (!targetList.Any()) GoToTarget(target);
+        targetList.Add(target);
     }
 
     /// <summary>
@@ -388,14 +392,6 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     {
         if (CheckIUnit(other) == null) return;
         TargetLockOn(other.gameObject);
-        nav.speed = 0f;
-    }
-
-    private void OnTriggerStay(Collider other)
-    {
-        if (CheckIUnit(other) == null) return;
-        var cheak = targetQueue.Where(x => x == other.gameObject);
-        if (cheak.Count() <= 0) targetQueue.Enqueue(other.gameObject); 
     }
 
     /// <summary>
