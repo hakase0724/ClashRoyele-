@@ -109,10 +109,20 @@ public class TestMove : Photon.MonoBehaviour, IUnit
 
         this.UpdateAsObservable()
             .SkipUntil(startTimer)
+            //navが有効でなければ
+            .Where(_=> nav != null)
+            //経路検索が終わっていなければ
             .Where(_ => !nav.pathPending)
             //対象との距離が0.5未満になったら到着したと判断する
             .Where(_ => nav.remainingDistance < 0.5f)
-            .Subscribe(_ => Move(), ex => Debug.Log("発生した例外：" + ex + "." + nav))
+            .Subscribe(_ => Move()
+            , ex => 
+            {
+                if (nav == null)
+                {
+                    Debug.Log("ユニットID:" + unitId + "発生した例外：" + ex);
+                }            
+            })
             .AddTo(gameObject);
 
         unitHp
@@ -316,8 +326,8 @@ public class TestMove : Photon.MonoBehaviour, IUnit
         //死ぬタイミングを合わせるためにRPC
         photonView.RPC("DeathSync", PhotonTargets.Others);
         //死んだタイミングで自分をfalseにする
-        gameObject.SetActive(false);
-        //RendererDisaible();
+        //gameObject.SetActive(false);
+        RendererDisaible();
         anim.enabled = false;
         isAlive = false;
         nav = null;
@@ -339,6 +349,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     [PunRPC]
     public void DeathSync()
     {
+        Debug.Log("破棄");
         Destroy(gameObject);
     }
 
