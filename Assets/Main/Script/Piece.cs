@@ -1,10 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using Photon;
 using UniRx;
 using UniRx.Triggers;
-using Photon;
-using static StaticUse;
+using UnityEngine;
 
 /// <summary>
 /// フィールドの各ブロックの処理

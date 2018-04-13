@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using System.Linq;
 using UniRx;
 using UniRx.Triggers;
+using UnityEngine;
 using UnityEngine.UI;
 using static StaticUse;
 
@@ -63,14 +61,15 @@ public class Main : Photon.MonoBehaviour
     [PunRPC]
     public void End()
     {
-        Debug.Log("終了処理開始");
         Time.timeScale = 0;
         this.UpdateAsObservable()
             .Where(_ => Input.anyKeyDown)
             .Subscribe(_ =>
             {
                 SceneLoad("Master");
+                //ルームから退出
                 PhotonNetwork.LeaveRoom();
+                //サーバーとの接続を切断する
                 PhotonNetwork.Disconnect();
             });
        
