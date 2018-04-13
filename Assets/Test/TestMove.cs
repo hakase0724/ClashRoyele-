@@ -20,26 +20,17 @@ public class TestMove : Photon.MonoBehaviour, IUnit
         public float myHp;
         //ユニットのアニメーションフラグ
         public bool animBool = false;
-
         public MyData(Vector3 pos, float hp, bool animBool)
         {
             myPos = pos;
             myHp = hp;
             this.animBool = animBool;
         }
-
         public MyData(Vector3 pos, float hp)
         {
             myPos = pos;
             myHp = hp;
         }
-
-        public void DataSet(Vector3 pos, float hp)
-        {
-            myPos = pos;
-            myHp = hp;
-        }
-
         public void DataSet(Vector3 pos, float hp, bool animBool)
         {
             myPos = pos;
@@ -63,12 +54,11 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     private NavMeshAgent nav;
     private Animator anim => GetComponent<Animator>();
     //攻撃対象を格納する
-    //private Queue<GameObject> targetQueue = new Queue<GameObject>();
     private List<GameObject> targetList = new List<GameObject>();
     //向かう場所左→右の順で格納している
     private List<Vector3> targets = new List<Vector3>();
+    //オブジェクトの生存状態
     private bool isAlive = true;
-    private AnimatorStateInfo info;
 
     [SerializeField, Tooltip("自分の体力")]
     private float _UnitHp;
@@ -80,6 +70,8 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     private float targetDistance;
     [SerializeField, Tooltip("ユニットの移動速度")]
     private float _UnitSpeed;
+    [SerializeField, Tooltip("生成後の待機時間")]
+    private int waitTime;
 
     private void Awake()
     {
@@ -96,6 +88,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     }
     private void Start()
     {
+        //PhotonViewのviewIDを手動割り当て(俗にいう違法建築)
         GetComponent<PhotonView>().viewID = unitId;
         nav.enabled = true;
         //自分が味方か敵かで対象を変える
@@ -104,11 +97,8 @@ public class TestMove : Photon.MonoBehaviour, IUnit
         LeftOrRight();
         //目的地に近づいたときに減速しないようにする
         nav.autoBraking = false;
-
         //動き出しを指定時間遅らせる
-        int waitTime = 2;
         var startTimer = Observable.Timer(TimeSpan.FromSeconds(waitTime));
-
         this.UpdateAsObservable()
             .SkipUntil(startTimer)
             //navが有効でなければ
@@ -117,44 +107,19 @@ public class TestMove : Photon.MonoBehaviour, IUnit
             .Where(_ => !nav.pathPending)
             //対象との距離が0.5未満になったら到着したと判断する
             .Where(_ => nav.remainingDistance < 0.5f)
-            .Subscribe(_ => Move()
-            , ex => 
-            {
-                if (nav == null)
-                {
-                    Debug.Log("ユニットID:" + unitId + "発生した例外：" + ex);
-                }            
-            })
+            .Subscribe(_ => Move())
             .AddTo(gameObject);
-
-        //this.UpdateAsObservable()
-        //    .Where(_ => Input.GetKeyDown(KeyCode.A))
-        //    .Subscribe(_ =>
-        //    {
-        //        if (!targetList.Any())
-        //        {
-        //            Debug.Log("ユニットID:" + unitId + "攻撃対象がいない");
-        //            Move();
-        //        }
-        //        else
-        //        {
-        //            GoToTarget(targetList.First());
-        //        }
-        //        foreach (var t in targetList)
-        //        {
-        //            Debug.Log("ユニットID:" + unitId + "攻撃対象" + (t.GetComponent(typeof(IUnit)) as IUnit).unitId);
-        //        }
-        //    });
 
         unitHp
             .Where(x => x <= 0)
             .Subscribe(x => Death())
             .AddTo(gameObject);
 
+        const int syncTime = 2;
         //対応するオブジェクトと同期をする　
         //現在は2秒に一回同期している 
         //マスタークライアントのみ送信する
-        Observable.Interval(TimeSpan.FromSeconds(2))
+        Observable.Interval(TimeSpan.FromSeconds(syncTime))
             .Where(_ => PhotonNetwork.isMasterClient)
             .Subscribe(_ => RaiseEvent())
             .AddTo(gameObject);
@@ -168,6 +133,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
         //myDataにデータをセット
         myData.DataSet(transform.position, unitHp.Value, animBool);
         //データを送るため送るデータをobject型の配列に格納
+        //送るデータは4種類
         object[] content = new object[4];
         content[0] = myData.myPos;
         content[1] = myData.myHp;
@@ -276,19 +242,20 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     public void MyColor(int id)
     {
         Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
-        int colorNumber;
+        //自分の色情報を格納
+        Color myColor;
         //生成者が自分か相手か判別
         if (IsSameId(id, PhotonNetwork.player.ID))
         {
-            colorNumber = 0;
+            myColor = color.First();
             isMine.Value = true;
         }
         else
         {
-            colorNumber = 1;
+            myColor = color.Last();
             isMine.Value = false;
         }
-        foreach (Renderer renderer in renderers) renderer.material.color = color[colorNumber];
+        foreach (Renderer renderer in renderers) renderer.material.color = myColor;
         //生成者が自分でなければ向きを反転させる
         if (!isMine.Value) transform.rotation = Quaternion.Euler(0, 180, 0);
     }
@@ -326,7 +293,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
         {
             var attackList = targetList
                 .Where(x => x != null)
-                .Where(x => CalcDistance(transform.position, x.transform.position) > targetDistance);
+                .Where(x => CalcDistance(transform.position, x.transform.position) <= targetDistance);
             if (attackList.Any()) GoToTarget(attackList.First());
             else isMove();
             targetList = attackList.ToList();
@@ -352,7 +319,9 @@ public class TestMove : Photon.MonoBehaviour, IUnit
             .Subscribe(_ => Destroy(gameObject))
             .AddTo(gameObject);
     }
-
+    /// <summary>
+    /// レンダラーを消して見えないようにする
+    /// </summary>
     private void RendererDisaible()
     {
         Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
@@ -392,6 +361,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     {
         if (CheckIUnit(other) == null) return;
         TargetLockOn(other.gameObject);
+        if (nav != null) nav.speed = 0f;
     }
 
     /// <summary>
