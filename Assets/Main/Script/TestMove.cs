@@ -43,11 +43,11 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     private bool animBool = false;
     public BoolReactiveProperty isMine { get; set; } = new BoolReactiveProperty();
     public FloatReactiveProperty unitHp { get; set; } = new FloatReactiveProperty();
+    //ユニットを出すときに消費するエネルギー
     public float unitEnergy { get; set; } = 1;
     public float unitSpeed { get; set; }
     public float maxUnitHp { get { return _UnitHp; } }
     public byte unitId { get; set; }
-
     //対象を格納している配列のポインタ
     private int targetPointa = 0;
     private TargetGet targetGet => Camera.main.GetComponent<TargetGet>();
@@ -59,7 +59,6 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     private List<Vector3> targets = new List<Vector3>();
     //オブジェクトの生存状態
     private bool isAlive = true;
-
     [SerializeField, Tooltip("自分の体力")]
     private float _UnitHp;
     [SerializeField, Tooltip("自分と相手のときそれぞれの色")]
@@ -88,7 +87,7 @@ public class TestMove : Photon.MonoBehaviour, IUnit
     }
     private void Start()
     {
-        //PhotonViewのviewIDを手動割り当て(俗にいう違法建築)
+        //PhotonViewのviewIDを手動割り当て
         GetComponent<PhotonView>().viewID = unitId;
         nav.enabled = true;
         //自分が味方か敵かで対象を変える
@@ -115,9 +114,9 @@ public class TestMove : Photon.MonoBehaviour, IUnit
             .Subscribe(x => Death())
             .AddTo(gameObject);
 
+        //同期間隔(秒)
         const int syncTime = 2;
         //対応するオブジェクトと同期をする　
-        //現在は2秒に一回同期している 
         //マスタークライアントのみ送信する
         Observable.Interval(TimeSpan.FromSeconds(syncTime))
             .Where(_ => PhotonNetwork.isMasterClient)

@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.EventSystems;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
-using UniRx;
-using UniRx.Triggers;
-using System.Linq;
 
 
 /// <summary>
@@ -39,17 +32,6 @@ public static class StaticUse
         return result;
     }
 
-    /// <summary>
-    /// すべてのストリームをDisPoseする
-    /// </summary>
-    /// <param name="disposeList">Disposeするストリーム</param>
-    public static void AllDispose(List<IDisposable> disposeList)
-    {
-        foreach(var d in disposeList)
-        {
-            d.Dispose();
-        }
-    }
     /// <summary>
     /// 2点間の距離を計算する
     /// </summary>

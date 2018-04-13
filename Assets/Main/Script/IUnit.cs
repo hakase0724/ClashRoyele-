@@ -8,6 +8,7 @@ using UniRx;
 /// </summary>
 public interface IUnit
 {
+    //生成者が自分か通信相手か
     BoolReactiveProperty isMine { get; set; }
     //ユニットの体力
     FloatReactiveProperty unitHp { get;set;}

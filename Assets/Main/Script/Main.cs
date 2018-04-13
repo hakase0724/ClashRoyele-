@@ -26,8 +26,10 @@ public class Main : Photon.MonoBehaviour
 
     private void Start()
     {
+        //ルーム内メンバーの規定数
         const int playMemberNum = 2;
 
+        //ルーム内のメンバーが規定数を下回ったらエラーとしてタイトルシーンに戻る
         this.UpdateAsObservable()
             .Select(x => PhotonNetwork.playerList.Length)
             .Where(x => x < playMemberNum)
@@ -46,6 +48,7 @@ public class Main : Photon.MonoBehaviour
             //現在のenergyの値を10分の１にしてゲージに反映させる
             .Subscribe(x => slider.value = x / 10);
 
+        //タワーの数が0を下回ったら終了処理を行う
         enemyCount
             .Buffer(2,1)
             .Select(x => x.Last())
@@ -54,6 +57,9 @@ public class Main : Photon.MonoBehaviour
             .AddTo(gameObject);
     }
 
+    /// <summary>
+    /// 終了処理を同期させる
+    /// </summary>
     [PunRPC]
     public void End()
     {
@@ -95,6 +101,10 @@ public class Main : Photon.MonoBehaviour
         else return true;
     }
 
+    /// <summary>
+    /// 落ちたタワーの数を更新する
+    /// </summary>
+    /// <param name="value">タワーの数</param>
     public void EnemyCount(int value)
     {
         enemyCount.Value += value;

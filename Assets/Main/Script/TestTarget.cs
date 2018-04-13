@@ -31,18 +31,7 @@ public class TestTarget :Photon.MonoBehaviour,IBuilding,IUnit
 
     public float unitSpeed { get; set; }
 
-    public byte unitId
-    {
-        get
-        {
-            throw new NotImplementedException();
-        }
-
-        set
-        {
-            throw new NotImplementedException();
-        }
-    }
+    public byte unitId { get; set; }
 
     public void Attack(float attack, GameObject attackTarget)
     {
@@ -86,21 +75,25 @@ public class TestTarget :Photon.MonoBehaviour,IBuilding,IUnit
         isMine.Value = _IsMine;
     }
 
-    // Use this for initialization
-    void Start () {
-
-        //Camera.main.GetComponent<TargetGet>().Enter(gameObject, isMine.Value);
-
+    private void Start ()
+    {
+        //体力が尽きたら消える
         unitHp
             .Where(x => x <= 0)
             .Subscribe(x => Death())
             .AddTo(gameObject);
 
+        //体力が変わったときお互いの体力を同期させる
         unitHp
             .Subscribe(x => photonView.RPC(("Sync"), PhotonTargets.Others, x))
             .AddTo(gameObject);
     }
 
+    /// <summary>
+    /// 体力を同期させる
+    /// お互いの体力を比べてより少ないほうに合わせる
+    /// </summary>
+    /// <param name="nowHp"></param>
     [PunRPC]
     public void Sync(float nowHp)
     {
@@ -110,6 +103,9 @@ public class TestTarget :Photon.MonoBehaviour,IBuilding,IUnit
         sync.Damage(sync.unitHp.Value - nowHp);
     }
 
+    /// <summary>
+    /// 消えるタイミングを同期させる
+    /// </summary>
     [PunRPC]
     public void DeathSync()
     {

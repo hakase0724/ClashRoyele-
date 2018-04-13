@@ -1,10 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using UniRx;
 /// <summary>
-/// MV(R)PのPresenter名前入力を受けて接続命令を走らせる
+/// 名前入力を受けてネットワーク接続命令を走らせる
 /// </summary>
 public class Presenter : MonoBehaviour
 {
@@ -25,5 +22,4 @@ public class Presenter : MonoBehaviour
         data.playerName = name;
         master.ConnectNetWork(data);
     }
-	
 }

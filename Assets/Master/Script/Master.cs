@@ -1,11 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Photon;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
-using UniRx;
+﻿using UniRx;
 using UniRx.Triggers;
+using UnityEngine;
 using static StaticUse;
 
 /// <summary>
@@ -27,7 +22,6 @@ public class Master : Photon.PunBehaviour
         {
             inputCanvas.SetActive(false);
             waitCanvas2.SetActive(true);
-            Debug.Log("部屋の中の自分の名前" + PhotonNetwork.playerName);
         }
     }
 
@@ -69,5 +63,4 @@ public class Master : Photon.PunBehaviour
 
     //Photon接続状態をGUIに表示する
     private void OnGUI() => GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
-
 }

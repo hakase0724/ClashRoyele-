@@ -154,7 +154,7 @@ Prefab:
     - target: {fileID: 224647237256022458, guid: 072fad76e8ce02a47a24a2af13d53fad,
         type: 2}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -80
       objectReference: {fileID: 0}
     - target: {fileID: 114300232960810704, guid: 072fad76e8ce02a47a24a2af13d53fad,
         type: 2}
@@ -231,7 +231,7 @@ Prefab:
     - target: {fileID: 224015868707107434, guid: 240bbb55c5e686640931e8c94e131ad8,
         type: 2}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -80
       objectReference: {fileID: 0}
     - target: {fileID: 114060621177813618, guid: 240bbb55c5e686640931e8c94e131ad8,
         type: 2}
@@ -622,8 +622,6 @@ GameObject:
   - component: {fileID: 373946975}
   - component: {fileID: 373946977}
   - component: {fileID: 373946976}
-  - component: {fileID: 373946978}
-  - component: {fileID: 373946979}
   - component: {fileID: 373946980}
   m_Layer: 5
   m_Name: MyInstantiateFiled
@@ -683,47 +681,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 373946974}
---- !u!114 &373946978
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 373946974}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8596c09f86e047741aab9e9d01990a6e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &373946979
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 373946974}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1862395651, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Delegates:
-  - eventID: 4
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 373946978}
-          m_MethodName: Click
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
-        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  delegates: []
 --- !u!114 &373946980
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1006,7 +963,7 @@ Prefab:
     - target: {fileID: 224049149397188136, guid: e9a03090613f34a43b03bca4f17b55a1,
         type: 2}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -80
       objectReference: {fileID: 0}
     - target: {fileID: 114931923889239558, guid: e9a03090613f34a43b03bca4f17b55a1,
         type: 2}
@@ -1269,7 +1226,7 @@ Prefab:
     - target: {fileID: 224539436976531164, guid: 75ab14c9622a5cb4c8594697b10ca044,
         type: 2}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -80
       objectReference: {fileID: 0}
     - target: {fileID: 114964566548517636, guid: 75ab14c9622a5cb4c8594697b10ca044,
         type: 2}
@@ -1377,7 +1334,7 @@ Prefab:
     - target: {fileID: 224380814097645722, guid: 36687defd936fe44c9e209bfef4c7397,
         type: 2}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -80
       objectReference: {fileID: 0}
     - target: {fileID: 114787836802788340, guid: 36687defd936fe44c9e209bfef4c7397,
         type: 2}
@@ -1849,7 +1806,7 @@ MonoBehaviour:
   - {fileID: 1063115031621326, guid: 0e7aeec25e5bc554bb6faa34ec0e0ecc, type: 2}
   - {fileID: 1266479190682134, guid: 873616b52002daa4d8838e3616c70e1e, type: 2}
   - {fileID: 1154171916112604, guid: d21b650614f623b41abacf0e3c1734bc, type: 2}
-  instantiateCheck: {fileID: 373946978}
+  instantiateCheck: {fileID: 0}
 --- !u!1 &1386258358 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 1071513864329024, guid: 240bbb55c5e686640931e8c94e131ad8,
@@ -2106,7 +2063,7 @@ Prefab:
     - target: {fileID: 224914832030911258, guid: 720cb14189071ce4c945da098fc256b1,
         type: 2}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -80
       objectReference: {fileID: 0}
     - target: {fileID: 114652394606025602, guid: 720cb14189071ce4c945da098fc256b1,
         type: 2}
